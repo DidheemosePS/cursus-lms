@@ -10,7 +10,8 @@ export default function Page() {
     {
       id: 1,
       userId: 482012,
-      avatar: "https://avatar.iran.liara.run/public/85",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=6",
       name: "Sarah Connor",
       course: "Intro to Web Design",
       completedModules: 7,
@@ -21,7 +22,8 @@ export default function Page() {
     {
       id: 2,
       userId: 882103,
-      avatar: "https://avatar.iran.liara.run/public/4",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=4",
       name: "Michael Chen",
       course: "Advanced Physics",
       completedModules: 3,
@@ -32,7 +34,8 @@ export default function Page() {
     {
       id: 3,
       userId: 559201,
-      avatar: "https://avatar.iran.liara.run/public/20",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=20",
       name: "Emma Watson",
       course: "History 101",
       completedModules: 9,
@@ -133,7 +136,7 @@ export default function Page() {
             >
               {/* Student Details */}
               <div className="flex items-center gap-3 w-full cursor-pointer hover:opacity-80">
-                <div className="bg-center bg-no-repeat bg-cover rounded-full size-10">
+                <div className="bg-center bg-no-repeat bg-cover rounded-full size-10 overflow-hidden">
                   <Image
                     src={student?.avatar}
                     width={100}

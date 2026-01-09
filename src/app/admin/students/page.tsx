@@ -62,7 +62,8 @@ export default function Page() {
     {
       id: 1,
       userId: 892345,
-      avatar: "https://avatar.iran.liara.run/public/29",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=2",
       name: "Alice Johnson",
       email: "alice.j@university.edu",
       isActive: true,
@@ -73,7 +74,8 @@ export default function Page() {
     {
       id: 2,
       userId: 892346,
-      avatar: "https://avatar.iran.liara.run/public/52",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=1",
       name: "Michael Chen",
       email: "m.chen@university.edu",
       isActive: false,
@@ -84,7 +86,8 @@ export default function Page() {
     {
       id: 3,
       userId: 892347,
-      avatar: "https://avatar.iran.liara.run/public/87",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=3",
       name: "Sarah Smith",
       email: "sarah.s@university.edu",
       isActive: true,
@@ -95,7 +98,8 @@ export default function Page() {
     {
       id: 4,
       userId: 892348,
-      avatar: "https://avatar.iran.liara.run/public/35",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=4",
       name: "James Wilson",
       email: "j.wilson@university.edu",
       isActive: true,
@@ -124,7 +128,7 @@ export default function Page() {
   };
 
   return (
-    <main className="@container min-h-[calc(100dvh-4rem)] px-4 py-8 md:px-12 space-y-8">
+    <main className="@container min-h-[calc(100dvh-4rem)] px-4 py-8 md:px-12 flex flex-col gap-8">
       <header className="space-y-1">
         <p className="text-2xl font-bold tracking-tight text-[#111318]">
           Admin Students

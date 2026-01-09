@@ -14,13 +14,13 @@ interface MessageBoxProps {
 export function MessageBoxLeft({ message }: { message: MessageBoxProps }) {
   return (
     <div className="flex gap-3 max-w-[85%] md:max-w-[70%]">
-      <div className="aspect-square rounded-full size-8 self-end mb-1">
+      <div className="rounded-full size-8 self-end mb-1 shrink-0 overflow-hidden">
         <Image
-          src={message?.avatar}
-          width={100}
-          height={100}
-          alt="logo"
-          className="object-cover overflow-hidden"
+          src={message.avatar}
+          alt="avatar"
+          width={48}
+          height={48}
+          className="w-full h-full object-cover"
         />
       </div>
       <div className="flex flex-col gap-1">

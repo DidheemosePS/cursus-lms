@@ -8,7 +8,7 @@ export default function Reviewed(data: SubmissionData) {
     <div className="group flex flex-col @5xl:grid @5xl:grid-cols-5 gap-4 p-4 @5xl:px-6 @5xl:py-5 items-center transition-colors bg-white hover:bg-gray-50">
       <div className="flex items-center gap-3 w-full cursor-pointer">
         <div className="relative">
-          <div className="bg-center bg-no-repeat bg-cover rounded-full size-10 grayscale">
+          <div className="bg-center bg-no-repeat bg-cover rounded-full size-10 grayscale overflow-hidden">
             <Image src={data?.avatar} width={100} height={100} alt="logo" />
           </div>
           <CircleTick className="size-5 absolute text-green-500 -bottom-1 -right-1 rounded-full border-2 border-white" />

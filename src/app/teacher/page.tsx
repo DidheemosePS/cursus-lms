@@ -26,7 +26,7 @@ export const submission_data: SubmissionData[] = [
   {
     id: 1,
     userId: 482012,
-    avatar: "https://avatar.iran.liara.run/public/85",
+    avatar: "https://testingbot.com/free-online-tools/random-avatar/100?img=6",
     name: "Sarah Connor",
     course: "Intro to Web Design",
     module: "3: CSS Grid",
@@ -39,7 +39,7 @@ export const submission_data: SubmissionData[] = [
   {
     id: 2,
     userId: 882103,
-    avatar: "https://avatar.iran.liara.run/public/4",
+    avatar: "https://testingbot.com/free-online-tools/random-avatar/100?img=4",
     name: "Michael Chen",
     course: "Advanced Physics",
     module: "2: Kinetics",
@@ -53,7 +53,7 @@ export const submission_data: SubmissionData[] = [
   {
     id: 3,
     userId: 559201,
-    avatar: "https://avatar.iran.liara.run/public/20",
+    avatar: "https://testingbot.com/free-online-tools/random-avatar/100?img=8",
     name: "Emma Watson",
     course: "History 101",
     module: "Final Essay",
@@ -66,7 +66,7 @@ export const submission_data: SubmissionData[] = [
   {
     id: 4,
     userId: 221004,
-    avatar: "https://avatar.iran.liara.run/public/87",
+    avatar: "https://testingbot.com/free-online-tools/random-avatar/100?img=2",
     name: "James Rodriguez",
     course: "Calculus II",
     module: "Homework 5",

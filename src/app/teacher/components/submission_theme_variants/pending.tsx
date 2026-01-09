@@ -6,7 +6,7 @@ export default function Pending(data: SubmissionData) {
   return (
     <div className="group flex flex-col @5xl:grid @5xl:grid-cols-5 gap-4 p-4 @5xl:px-6 @5xl:py-5 items-center transition-colors bg-white hover:bg-gray-50">
       <div className="flex items-center gap-3 w-full cursor-pointer hover:opacity-80">
-        <div className="bg-center bg-no-repeat bg-cover rounded-full size-10">
+        <div className="bg-center bg-no-repeat bg-cover rounded-full size-10 overflow-hidden">
           <Image src={data?.avatar} width={100} height={100} alt="logo" />
         </div>
         <div className="flex flex-col min-w-0">

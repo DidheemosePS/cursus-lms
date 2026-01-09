@@ -13,7 +13,8 @@ export default function StudentNav({
   const LOGO_URL =
     "https://epearlacademy.com/pluginfile.php/1/theme_alpha/alphasettingsimgs/0/finallogo.png";
 
-  const avatar = "https://avatar.iran.liara.run/public/86";
+  const avatar =
+    "https://testingbot.com/free-online-tools/random-avatar/100?img=6";
 
   return (
     <header className="h-16 flex justify-between items-center border-b border-[#f0f2f4] bg-white px-4 shadow-md">
@@ -23,9 +24,10 @@ export default function StudentNav({
         </button>
         <Image
           src={LOGO_URL}
-          width={100}
-          height={40}
+          width={64}
+          height={64}
           alt="Epearl Academy Logo"
+          unoptimized
         />
       </div>
       <div className="flex items-center gap-6">

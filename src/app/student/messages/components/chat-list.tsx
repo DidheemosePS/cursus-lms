@@ -13,7 +13,8 @@ export default function ChatList({
   const chats = [
     {
       id: 1,
-      avatar: "https://avatar.iran.liara.run/public/60",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=8",
       name: "CS101 Project Group",
       course: "Computer Science 101",
       recent_message: "Sarah: I've uploaded the diagrams...",
@@ -23,7 +24,8 @@ export default function ChatList({
     },
     {
       id: 2,
-      avatar: "https://avatar.iran.liara.run/public/35",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=4",
       name: "Dr. Sarah Smith",
       course: "Biology 101",
       recent_message: "Hi Dr. Smith, I am just finishing the...",
@@ -33,7 +35,8 @@ export default function ChatList({
     },
     {
       id: 3,
-      avatar: "https://avatar.iran.liara.run/public/52",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=5",
       name: "Prof. Alan Grant",
       course: "Paleontology",
       recent_message: "Please review the syllabus for next week...",
@@ -43,7 +46,8 @@ export default function ChatList({
     },
     {
       id: 4,
-      avatar: "https://avatar.iran.liara.run/public/28",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=7",
       name: "Ms. Valerie Frizzle",
       course: "Science Lab",
       recent_message: "Field trip permission slips are due...",
@@ -106,7 +110,7 @@ export default function ChatList({
                 <div className="size-12 rounded-full overflow-hidden shrink-0 border border-[#f0f2f4]">
                   <Image
                     src={chat.avatar}
-                    alt=""
+                    alt="avatar"
                     width={48}
                     height={48}
                     className="w-full h-full object-cover"

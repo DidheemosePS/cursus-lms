@@ -41,6 +41,11 @@ const nextConfig: NextConfig = {
         pathname: "**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "testingbot.com",
+        pathname: "**",
+      },
     ],
   },
 };

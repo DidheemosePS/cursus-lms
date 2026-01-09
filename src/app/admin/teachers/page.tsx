@@ -8,7 +8,8 @@ export default function Page() {
   const teachers = [
     {
       id: 1,
-      avatar: "https://avatar.iran.liara.run/public/62",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=6",
       name: "Sarah Jenkins",
       email: "sarah.j@school.edu",
       assigned: 4,
@@ -16,7 +17,8 @@ export default function Page() {
     },
     {
       id: 2,
-      avatar: "https://avatar.iran.liara.run/public/29",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=7",
       name: "Michael Ross",
       email: "michael.r@school.edu",
       assigned: 0,
@@ -24,7 +26,8 @@ export default function Page() {
     },
     {
       id: 3,
-      avatar: "https://avatar.iran.liara.run/public/4",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=8",
       name: "Emily Chen",
       email: "emily.chen@school.edu",
       assigned: 2,
@@ -32,7 +35,8 @@ export default function Page() {
     },
     {
       id: 4,
-      avatar: "https://avatar.iran.liara.run/public/65",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=9",
       name: "David Kim",
       email: "david.k@school.edu",
       assigned: 5,
@@ -40,7 +44,8 @@ export default function Page() {
     },
     {
       id: 5,
-      avatar: "https://avatar.iran.liara.run/public/87",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=10",
       name: "Robert Fox",
       email: "robert.fox@school.edu",
       assigned: 1,

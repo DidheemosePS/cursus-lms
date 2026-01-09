@@ -25,7 +25,8 @@ export default function ChatWindow({
     {
       id: 1312,
       user_id: 2,
-      avatar: "https://avatar.iran.liara.run/public/35",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=6",
       name: "Sarah Smith",
       message:
         "Hello everyone! I've uploaded the initial diagrams for the project to our shared folder. Can you all take a look?",
@@ -35,7 +36,8 @@ export default function ChatWindow({
     {
       id: 8767,
       user_id: 5,
-      avatar: "https://avatar.iran.liara.run/public/86",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=8",
       name: "Alex Johnson",
       message:
         "Thanks Sarah! I will check them out right now and leave some comments if I see anything.",
@@ -45,7 +47,8 @@ export default function ChatWindow({
     {
       id: 3242,
       user_id: 3,
-      avatar: "https://avatar.iran.liara.run/public/52",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=2",
       name: "Alan Grant",
       message:
         "Looks good to me. Just make sure we follow the professor's naming convention for the files.",
@@ -55,7 +58,8 @@ export default function ChatWindow({
     {
       id: 5765,
       user_id: 5,
-      avatar: "https://avatar.iran.liara.run/public/86",
+      avatar:
+        "https://testingbot.com/free-online-tools/random-avatar/100?img=3",
       name: "Alex Johnson",
       message: "I also attached the file for you to check.",
       timestamp: "10:10 AM",
@@ -82,13 +86,13 @@ export default function ChatWindow({
             <Group className="size-7" />
           </div>
         ) : (
-          <div className="flex items-center justify-center bg-[#135BEC]/10 text-[#135BEC] rounded-full size-10 shrink-0">
+          <div className="flex items-center justify-center bg-[#135BEC]/10 text-[#135BEC] rounded-full size-10 shrink-0 overflow-hidden">
             <Image
-              src={chat?.avatar}
-              width={100}
-              height={100}
-              alt="logo"
-              className="object-cover overflow-hidden"
+              src={chat.avatar}
+              alt="avatar"
+              width={48}
+              height={48}
+              className="w-full h-full object-cover"
             />
           </div>
         )}
