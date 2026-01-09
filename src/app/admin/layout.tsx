@@ -1,16 +1,9 @@
 import ClientWrapper from "./client-wrapper";
 
-export default function StudentLayout({
+export default async function StudentLayout({
   children,
-  modal,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-  modal: React.ReactNode;
-}>) {
-  return (
-    <ClientWrapper>
-      {children}
-      {modal}
-    </ClientWrapper>
-  );
+}) {
+  return <ClientWrapper>{children}</ClientWrapper>;
 }
