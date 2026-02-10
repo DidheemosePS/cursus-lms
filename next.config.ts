@@ -46,6 +46,11 @@ const nextConfig: NextConfig = {
         hostname: "testingbot.com",
         pathname: "**",
       },
+      {
+        protocol: "https",
+        hostname: "lms-mvp-test.s3.eu-west-1.amazonaws.com",
+        pathname: "**",
+      },
     ],
   },
 };
