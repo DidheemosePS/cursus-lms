@@ -4,7 +4,7 @@ import { s3Client } from "./s3.utils";
 
 export async function S3Delete(
   url: string,
-): Promise<{ success: boolean; error: string }> {
+): Promise<{ success: boolean; message: string }> {
   try {
     const key = new URL(url).pathname.slice(1);
 
@@ -15,10 +15,10 @@ export async function S3Delete(
 
     await s3Client.send(command);
 
-    return { success: true, error: "File deleted successfully" };
+    return { success: true, message: "File deleted successfully" };
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    return { success: false, error: errorMessage };
+    return { success: false, message: errorMessage };
   }
 }

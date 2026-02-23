@@ -4,7 +4,7 @@ import Tick from "@/assets/icons/circle-tick.svg";
 import Plus from "@/assets/icons/plus.svg";
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react";
 import { modulesFormSchema } from "@/lib/validation/modules";
-import { parseFormToArray } from "@/lib/parse-form-to-array";
+import { parseFormToArray } from "@/utils/parse-form-to-array";
 import { createModule } from "./actions";
 import ErrorMessage from "./error-message";
 import ModuleCard from "./module-card";

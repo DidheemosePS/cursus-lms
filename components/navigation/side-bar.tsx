@@ -45,8 +45,8 @@ function SideBar({ NAV_LINKS }: SideBarProps) {
           href={item.href}
           className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
             isActive
-              ? "bg-[#135bec] hover:bg-[#135bec]/90 text-white hover:text-white/90"
-              : "hover:bg-gray-100 text-[#616f89] hover:text-[#111318]"
+              ? "bg-blue-500 hover:bg-blue-600 text-white hover:text-white/90"
+              : "hover:bg-gray-100 text-gray-500 hover:text-gray-600"
           }`}
         >
           <Icon className="size-5" />
@@ -65,16 +65,16 @@ function SideBar({ NAV_LINKS }: SideBarProps) {
   };
 
   return (
-    <aside className="md:h-[calc(100dvh-4rem)] md:w-64 md:fixed md:top-16 md:z-40 shadow-md bg-white flex flex-col justify-between p-4 overflow-y-auto border-r sm:border-0 border-[#f0f2f4] divide-y md:divide-y-0 divide-gray-200">
+    <aside className="md:h-[calc(100dvh-4rem)] md:w-64 md:fixed md:top-16 md:z-40 shadow-md bg-white flex flex-col justify-between p-4 overflow-y-auto border-r sm:border-0 border-gray-100 divide-y md:divide-y-0 divide-gray-100">
       <div className="flex flex-col gap-1 pb-4 md:pb-0">
         {renderItems(itemsBySection.top)}
       </div>
 
-      <div className="flex flex-col pt-4 md:border-t border-gray-200">
+      <div className="flex flex-col pt-4 md:border-t border-gray-100">
         {renderItems(itemsBySection.bottom)}
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 text-[#616f89] hover:text-[#111318]"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-200 text-gray-500 hover:text-gray-600"
         >
           <SignOut className="size-5" />
           <span>Sign Out</span>

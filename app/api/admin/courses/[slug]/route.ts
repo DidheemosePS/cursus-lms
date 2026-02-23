@@ -56,7 +56,7 @@ export async function PATCH(
   if (file instanceof File) {
     const previousImageUrl = formData.get("previousImageUrl");
 
-    const s3Upload = await S3Upload(file);
+    const s3Upload = await S3Upload(file, "coverImage");
 
     if (!s3Upload.success)
       return NextResponse.json({

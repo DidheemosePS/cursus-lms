@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Edit from "@/assets/icons/edit.svg";
 import type { SubmissionData } from "../../page";
+import Link from "next/link";
 
 export default function Pending(data: SubmissionData) {
   return (
@@ -16,18 +17,31 @@ export default function Pending(data: SubmissionData) {
           <p className="text-gray-500 text-xs truncate">ID: {data?.userId}</p>
         </div>
       </div>
-      <div className="w-full flex flex-col justify-center">
-        <span className="@5xl:hidden text-xs font-medium text-gray-500 mb-1">
-          Course Info:
-        </span>
-        <a
-          className="text-[#111518] text-sm font-medium truncate hover:text-primary transition-colors cursor-pointer"
-          href="#"
-          title="View Course Overview"
-        >
-          {data?.course}
-        </a>
-        <p className="text-gray-500 text-xs truncate">Module {data?.module}</p>
+      <div className="w-full flex flex-col justify-center gap-1.5">
+        <div className="flex items-center justify-between @5xl:justify-start gap-2">
+          <span className="@5xl:hidden text-xs font-medium text-gray-500">
+            Course Info:
+          </span>
+          <Link
+            className="text-[#111518] text-sm font-medium truncate hover:text-primary transition-colors cursor-pointer"
+            href="#"
+            title="View Course Overview"
+          >
+            {data?.course}
+          </Link>
+        </div>
+        <div className="flex items-center justify-between @5xl:justify-start gap-2">
+          <span className="@5xl:hidden text-xs font-medium text-gray-500">
+            Module:
+          </span>
+          <Link
+            className="text-gray-500 text-xs truncate hover:text-primary transition-colors cursor-pointer"
+            href="#"
+            title="View Course Overview"
+          >
+            {data?.module}
+          </Link>
+        </div>
       </div>
       <div className="w-full flex flex-col justify-center gap-1.5">
         <div className="flex items-center justify-between @5xl:justify-start gap-2">

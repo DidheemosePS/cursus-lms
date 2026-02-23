@@ -1,6 +1,6 @@
 "use client";
 
-import formatTimeAgo from "./format-date";
+import { formatTimeAgo } from "../../../../../../utils/timestamp-formatter";
 import GetStatusIndicatorColor from "./get-status-indicator-color";
 import { CourseStatus, STATUS_CONFIG } from "./visibility";
 

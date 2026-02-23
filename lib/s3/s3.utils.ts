@@ -11,8 +11,8 @@ export const S3_CONFIG = {
 // Upload Config
 export const UPLOAD_CONFIG = {
   MAX_FILE_SIZE: 5242880, // 5MB in bytes
-  ALLOWED_TYPES: ["image/jpeg", "image/png", "image/webp"],
-  FOLDER: "coverImage",
+  ALLOWED_TYPES: ["image/jpeg", "image/png", "image/webp", "application/pdf"],
+  FOLDER: ["coverImage", "submission"],
 } as const;
 
 // Error types
@@ -52,3 +52,54 @@ export const s3Client = new S3Client({
     secretAccessKey: S3_CONFIG.SECRET_ACCESS_KEY,
   },
 });
+
+export function validateFile(file: File): {
+  valid: boolean;
+  fileName?: string;
+  error?: string;
+  code?: S3ErrorCode;
+} {
+  // Check file exists or not
+  if (!file)
+    return { valid: false, error: "No file found", code: "INVALID_FILE" };
+
+  // Check file size
+  if (file.size === 0)
+    return { valid: false, error: "File is empty", code: "INVALID_FILE" };
+
+  //   Check file max size
+  if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE)
+    return {
+      valid: false,
+      error: `File size exceed ${UPLOAD_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB limit`,
+    };
+
+  // Check file type
+  if (
+    !UPLOAD_CONFIG.ALLOWED_TYPES.includes(
+      file.type as
+        | "image/jpeg"
+        | "image/png"
+        | "image/webp"
+        | "application/pdf",
+    )
+  ) {
+    return {
+      valid: false,
+      error: `Invalid file type. Allowed types: ${UPLOAD_CONFIG.ALLOWED_TYPES.join(", ")}`,
+      code: "INVALID_FILE_TYPE",
+    };
+  }
+
+  //   Check file name
+  if (!file.name || file.name.trim().length === 0)
+    return {
+      valid: false,
+      error: "File name is invalid",
+      code: "INVALID_FILE",
+    };
+
+  const fileName = file.name.replaceAll(" ", "-");
+
+  return { valid: true, fileName };
+}

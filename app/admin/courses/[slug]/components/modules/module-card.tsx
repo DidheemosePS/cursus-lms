@@ -3,7 +3,7 @@
 import Drag from "@/assets/icons/drag.svg";
 import DeleteButton from "./module-card/delete-button";
 import Calendar from "@/assets/icons/calendar.svg";
-import toDateInputValue from "@/lib/to-date-input-value";
+import toDateInputValue from "@/utils/to-date-input-value";
 import DateInput from "./module-card/date-input";
 import { Dispatch, SetStateAction } from "react";
 import { ModulesProps } from "./modules";

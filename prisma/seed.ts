@@ -113,16 +113,28 @@ export async function main() {
   // ------------------------
   // Course
   // ------------------------
-  const course = await prisma.course.create({
-    data: {
-      organizationId: org.id,
-      title: "Full Stack Web Development",
-      description: "Learn modern web development with hands-on modules.",
-      code: "FSWD-101",
-      status: "active",
-      coverImageUrl:
-        "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/Linkedin-Profile.png",
-    },
+  const course = await prisma.course.createManyAndReturn({
+    data: [
+      {
+        organizationId: org.id,
+        title: "Full Stack Web Development",
+        description: "Learn modern web development with hands-on modules.",
+        code: "FSWD-101",
+        status: "active",
+        coverImageUrl:
+          "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/coverImage/1770727138011-didhee.png",
+      },
+      {
+        organizationId: org.id,
+        title: "Data Science for Beginners",
+        description:
+          "An introduction to data analysis, visualization, and machine learning using Python.",
+        code: "JSWB-143",
+        status: "active",
+        coverImageUrl:
+          "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/coverImage/1770727138011-didhee.png",
+      },
+    ],
   });
 
   // ------------------------
@@ -131,7 +143,7 @@ export async function main() {
   await prisma.module.createMany({
     data: [
       {
-        courseId: course.id,
+        courseId: course[0].id,
         title: "Introduction to Web",
         description: "Basics of the web and how it works",
         position: 1,
@@ -139,7 +151,7 @@ export async function main() {
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
       {
-        courseId: course.id,
+        courseId: course[0].id,
         title: "HTML & CSS",
         description: "Build static pages with HTML and CSS",
         position: 2,
@@ -147,7 +159,7 @@ export async function main() {
         dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       },
       {
-        courseId: course.id,
+        courseId: course[0].id,
         title: "JavaScript Basics",
         description: "Programming fundamentals with JavaScript",
         position: 3,
@@ -163,11 +175,11 @@ export async function main() {
   await prisma.courseInstructor.createMany({
     data: [
       {
-        courseId: course.id,
+        courseId: course[0].id,
         instructorId: instructor1.id,
       },
       {
-        courseId: course.id,
+        courseId: course[0].id,
         instructorId: instructor2.id,
       },
     ],
@@ -179,21 +191,27 @@ export async function main() {
   await prisma.enrollment.createMany({
     data: [
       {
-        courseId: course.id,
+        courseId: course[0].id,
         learnerId: learner1.id,
-        status: "enrolled",
+        enrollmentStatus: "enrolled",
         enrolledAt: new Date(),
       },
       {
-        courseId: course.id,
+        courseId: course[1].id,
+        learnerId: learner1.id,
+        enrollmentStatus: "enrolled",
+        enrolledAt: new Date(),
+      },
+      {
+        courseId: course[0].id,
         learnerId: learner2.id,
-        status: "unenrolled",
+        enrollmentStatus: "unenrolled",
         inviteSentAt: new Date(),
       },
       {
-        courseId: course.id,
+        courseId: course[0].id,
         learnerId: learner3.id,
-        status: "enrolled",
+        enrollmentStatus: "enrolled",
         enrolledAt: new Date(),
       },
     ],
@@ -204,7 +222,7 @@ export async function main() {
   // ------------------------
   const groupConversation = await prisma.conversation.create({
     data: {
-      courseId: course.id,
+      courseId: course[0].id,
       type: "group",
     },
   });
@@ -215,6 +233,29 @@ export async function main() {
       { conversationId: groupConversation.id, userId: learner1.id },
       { conversationId: groupConversation.id, userId: learner3.id },
     ],
+  });
+
+  const modules = await prisma.module.findMany({
+    where: {
+      courseId: course[0].id,
+    },
+    orderBy: { position: "asc" },
+  });
+
+  await prisma.submission.createMany({
+    data: modules.map((m) => ({
+      moduleId: m.id,
+      learnerId: learner1.id,
+      attemptNumber: 1,
+      fileUrl:
+        "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/submissions/Resume_Didheemose.pdf",
+      fileName: "submissions/Resume_Didheemose.pdf",
+      fileSize: 80,
+
+      submittedAt: new Date(),
+      isLate: false,
+      status: "submitted",
+    })),
   });
 
   console.log("✅ Seed completed successfully");

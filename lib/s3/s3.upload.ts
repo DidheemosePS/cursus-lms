@@ -1,51 +1,10 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { S3_CONFIG, s3Client, S3ErrorCode, S3UploadResult, UPLOAD_CONFIG } from "./s3.utils";
+import { S3UploadResult, validateFile, S3_CONFIG, s3Client } from "./s3.utils";
 
-function validateFile(file: File): {
-  valid: boolean;
-  error?: string;
-  code?: S3ErrorCode;
-} {
-  // Check file exists or not
-  if (!file)
-    return { valid: false, error: "No file found", code: "INVALID_FILE" };
-
-  // Check file size
-  if (file.size === 0)
-    return { valid: false, error: "File is empty", code: "INVALID_FILE" };
-
-  //   Check file max size
-  if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE)
-    return {
-      valid: false,
-      error: `File size exceed ${UPLOAD_CONFIG.MAX_FILE_SIZE / 1024 / 1024}MB limit`,
-    };
-
-  // Check file type
-  if (
-    !UPLOAD_CONFIG.ALLOWED_TYPES.includes(
-      file.type as "image/jpeg" | "image/png" | "image/webp",
-    )
-  ) {
-    return {
-      valid: false,
-      error: `Invalid file type. Allowed types: ${UPLOAD_CONFIG.ALLOWED_TYPES.join(", ")}`,
-      code: "INVALID_FILE_TYPE",
-    };
-  }
-
-  //   Check file name
-  if (!file.name || file.name.trim().length === 0)
-    return {
-      valid: false,
-      error: "File name is invalid",
-      code: "INVALID_FILE",
-    };
-
-  return { valid: true };
-}
-
-export default async function S3Upload(file: File): Promise<S3UploadResult> {
+export default async function S3Upload(
+  file: File,
+  folder: "coverImage" | "submission",
+): Promise<S3UploadResult> {
   try {
     // validate File
     const fileValidation = validateFile(file);
@@ -57,7 +16,7 @@ export default async function S3Upload(file: File): Promise<S3UploadResult> {
       };
 
     //   Create S3 key
-    const key = `coverImage/${Date.now()}-${file.name}`;
+    const key = `${folder}/${Date.now()}-${fileValidation.fileName}`;
 
     // Convert file to buffer
     const buffer = Buffer.from(await file.arrayBuffer());

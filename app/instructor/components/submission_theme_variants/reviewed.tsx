@@ -11,7 +11,7 @@ export default function Reviewed(data: SubmissionData) {
           <div className="bg-center bg-no-repeat bg-cover rounded-full size-10 grayscale overflow-hidden">
             <Image src={data?.avatar} width={100} height={100} alt="logo" />
           </div>
-          <CircleTick className="size-5 absolute text-green-500 -bottom-1 -right-1 rounded-full border-2 border-white" />
+          <CircleTick className="size-4 absolute bg-green-500 text-white -bottom-0.5 -right-0.5 rounded-full" />
         </div>
         <div className="flex flex-col min-w-0">
           <p className="text-[#111518] text-sm font-bold truncate">

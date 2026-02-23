@@ -133,6 +133,12 @@ model CourseInstructor {
   @@unique([courseId, instructorId])
 }
 
+enum ProgressStatus {
+  in_progress
+  not_started
+  completed
+}
+
 model Enrollment {
   id        String @id @default(uuid(7))
   courseId  String
@@ -141,9 +147,16 @@ model Enrollment {
   course  Course @relation(fields: [courseId], references: [id])
   learner User   @relation(fields: [learnerId], references: [id])
 
-  status       EnrollmentStatus
+  enrollmentStatus       EnrollmentStatus
+  progressStatus ProgressStatus @default(not_started)
+  progressPercent Float @default(0)
+  completedModules Int @default(0)
+  lastProgressAt DateTime?
+
+
   enrolledAt   DateTime?
   inviteSentAt DateTime?
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -164,7 +177,6 @@ model Submission {
   fileName      String
   fileSize      Int
 
-  submittedAt DateTime
   isLate      Boolean
   status      SubmissionStatus @default(submitted)
 
