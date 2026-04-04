@@ -1,5 +1,5 @@
 import { FieldChanges } from "@/app/admin/courses/[slug]/components/course-info/course-info";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 import { unstable_cache } from "next/cache";
 
 export async function getCoursesByOrganization(organizationId: string) {
@@ -131,6 +131,7 @@ export async function searchInstructors(courseId: string, name: string) {
       id: true,
       name: true,
       role: true,
+      avatar: true,
     },
   });
 }

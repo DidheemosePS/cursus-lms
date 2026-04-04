@@ -16,8 +16,8 @@ export default function LearnerNav({
   const LOGO_URL =
     "https://epearlacademy.com/pluginfile.php/1/theme_alpha/alphasettingsimgs/0/finallogo.png";
 
-  const avatar =
-    "https://testingbot.com/free-online-tools/random-avatar/100?img=6";
+  const DEFAULT_AVATAR =
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(6).png";
 
   return (
     <header className="h-16 flex justify-between items-center border-b border-[#f0f2f4] bg-white px-4 shadow-md">
@@ -54,13 +54,15 @@ export default function LearnerNav({
             <p className="text-sm font-medium text-[#111318]">{session.name}</p>
             <p className="text-sm text[#616f89]">Learner ID: {session.role}</p>
           </div>
-          <Image
-            src={avatar}
-            width={100}
-            height={100}
-            alt="logo"
-            className="size-10 rounded-full border border-[#f0f2f4] object-cover"
-          />
+          <div className="relative size-10 shrink-0 overflow-hidden rounded-full border border-gray-100 shadow-sm">
+            <Image
+              src={session.avatar ?? DEFAULT_AVATAR}
+              alt={`${session.name}'s avatar`}
+              fill
+              sizes="40px"
+              className="object-cover transition-transform hover:scale-110"
+            />
+          </div>
         </div>
       </div>
     </header>

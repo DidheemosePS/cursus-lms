@@ -36,8 +36,8 @@ enum SubmissionStatus {
 }
 
 enum ConversationType {
-  direct
-  group
+  DIRECT
+  GROUP
 }
 
 enum NotificationType {
@@ -68,6 +68,7 @@ model User {
   salt         String
   role         UserRole
   status       UserStatus @default(pending_invite)
+  avatar       String @default("https://testingbot.com/free-online-tools/random-avatar/100?img=4")
 
   enrollments Enrollment[]
   instructedCourses CourseInstructor[]
@@ -204,20 +205,32 @@ model Feedback {
 
 model Conversation {
   id       String           @id @default(uuid(7))
-  courseId String
   type     ConversationType
-
+  
+  courseId String
   course   Course               @relation(fields: [courseId], references: [id])
+
+  lastMessageId String? @unique
+  lastMessageAt DateTime @default(now())
+
   members  ConversationMember[]
   messages Message[]
 
+  latestMessage Message?  @relation("LatestMessage", fields: [lastMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
   createdAt DateTime @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([lastMessageAt(sort: Desc)])
 }
 
 model ConversationMember {
   id             String @id @default(uuid(7))
   conversationId String
   userId         String
+
+  unreadCount Int @default(0)
+  lastReadAt     DateTime @default(now())
 
   conversation Conversation @relation(fields: [conversationId], references: [id])
   user         User         @relation(fields: [userId], references: [id])
@@ -229,11 +242,12 @@ model Message {
   id             String @id @default(uuid(7))
   conversationId String
   senderId       String
+  content String
 
   conversation Conversation @relation(fields: [conversationId], references: [id])
   sender       User         @relation(fields: [senderId], references: [id])
 
-  content String
+  lastMessageFor  Conversation? @relation("LatestMessage")
 
   createdAt DateTime @default(now())
 }

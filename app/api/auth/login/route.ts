@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
       const fieldErrors = z.flattenError(parsed.error)?.fieldErrors;
       return NextResponse.json(
         { success: false, error: fieldErrors },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     if (!result.success || !result.user) {
       return NextResponse.json(
         { success: false, error: result.error || "Invalid credentials" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     session.role = result.user.role;
     session.organizationId = result.user.organizationId;
     session.isLoggedIn = true;
+    session.avatar = result.user.avatar;
 
     await session.save();
 
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
     console.log("Signin error:", error);
     return NextResponse.json(
       { success: false, error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

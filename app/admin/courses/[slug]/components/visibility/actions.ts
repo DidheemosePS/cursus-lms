@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@/lib/auth/auth";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export async function updateCourseStatus(
   courseId: string,

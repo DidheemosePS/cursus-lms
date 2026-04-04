@@ -1,5 +1,5 @@
 import { Status } from "@/app/learner/my-courses/components/course-card";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 import { unstable_cache } from "next/cache";
 
 export async function filterCourses(learnerId: string, status?: Status) {

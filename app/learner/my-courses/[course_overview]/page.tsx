@@ -5,7 +5,7 @@ import Completed from "./modules-theme/completed";
 import Current from "./modules-theme/current";
 import Locked from "./modules-theme/locked";
 import { getLearnerCourseOverview } from "@/dal/admin/learners.dal";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export interface Submission {
   id: string;

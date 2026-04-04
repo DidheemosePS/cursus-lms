@@ -12,6 +12,7 @@ export interface Instructor {
   id: string;
   name: string;
   role: "admin" | "instructor" | "learner";
+  avatar: string;
 }
 
 export interface InstructorsProps {

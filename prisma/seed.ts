@@ -20,121 +20,83 @@ export async function main() {
   });
 
   // ------------------------
-  // Admin
+  // Users
   // ------------------------
-  const adminHash = await hashPassword("didheenotoutadmin");
-
-  const admin = await prisma.user.create({
-    data: {
-      organizationId: org.id,
-      name: "Admin User",
-      email: "admin@demo.com",
-      passwordHash: adminHash.hash,
-      salt: adminHash.salt,
-      role: "admin",
-      status: "active",
-    },
-  });
-
-  // ------------------------
-  // Instructors
-  // ------------------------
-  const instructor1Hash = await hashPassword("didheenotoutinstructor1");
-
-  const instructor1 = await prisma.user.create({
-    data: {
-      organizationId: org.id,
-      name: "Sarah Instructor",
-      email: "sarah@demo.com",
-      passwordHash: instructor1Hash.hash,
-      salt: instructor1Hash.salt,
-      role: "instructor",
-      status: "active",
-    },
-  });
-
-  const instructor2Hash = await hashPassword("didheenotoutinstructor2");
-
-  const instructor2 = await prisma.user.create({
-    data: {
-      organizationId: org.id,
-      name: "John Instructor",
-      email: "john@demo.com",
-      passwordHash: instructor2Hash.hash,
-      salt: instructor2Hash.salt,
-      role: "instructor",
-      status: "active",
-    },
-  });
-
-  // ------------------------
-  // Learners
-  // ------------------------
-  const learner1Hash = await hashPassword("didheenotoutlearner1");
-  const learner2Hash = await hashPassword("didheenotoutlearner2");
-  const learner3Hash = await hashPassword("didheenotoutlearner3");
-
-  const learner1 = await prisma.user.create({
-    data: {
-      organizationId: org.id,
-      name: "Alice Learner",
-      email: "alice@demo.com",
-      passwordHash: learner1Hash.hash,
-      salt: learner1Hash.salt,
-      role: "learner",
-      status: "active",
-    },
-  });
-
-  const learner2 = await prisma.user.create({
-    data: {
-      organizationId: org.id,
-      name: "Bob Learner",
-      email: "bob@demo.com",
-      passwordHash: learner2Hash.hash,
-      salt: learner2Hash.salt,
-      role: "learner",
-      status: "active",
-    },
-  });
-
-  const learner3 = await prisma.user.create({
-    data: {
-      organizationId: org.id,
-      name: "Charlie Learner",
-      email: "charlie@demo.com",
-      passwordHash: learner3Hash.hash,
-      salt: learner3Hash.salt,
-      role: "learner",
-      status: "active",
-    },
-  });
-
-  // ------------------------
-  // Course
-  // ------------------------
-  const course = await prisma.course.createManyAndReturn({
-    data: [
-      {
+  const createUser = async (
+    name: string,
+    email: string,
+    password: string,
+    role: "admin" | "instructor" | "learner",
+  ) => {
+    const hash = await hashPassword(password);
+    return prisma.user.create({
+      data: {
         organizationId: org.id,
-        title: "Full Stack Web Development",
-        description: "Learn modern web development with hands-on modules.",
-        code: "FSWD-101",
+        name,
+        email,
+        passwordHash: hash.hash,
+        salt: hash.salt,
+        role,
         status: "active",
-        coverImageUrl:
-          "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/coverImage/1770727138011-didhee.png",
       },
-      {
-        organizationId: org.id,
-        title: "Data Science for Beginners",
-        description:
-          "An introduction to data analysis, visualization, and machine learning using Python.",
-        code: "JSWB-143",
-        status: "active",
-        coverImageUrl:
-          "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/coverImage/1770727138011-didhee.png",
-      },
-    ],
+    });
+  };
+
+  const admin = await createUser(
+    "Admin User",
+    "admin@demo.com",
+    "password",
+    "admin",
+  );
+
+  const instructor1 = await createUser(
+    "Sarah Instructor",
+    "sarah@demo.com",
+    "password",
+    "instructor",
+  );
+
+  const instructor2 = await createUser(
+    "John Instructor",
+    "john@demo.com",
+    "password",
+    "instructor",
+  );
+
+  const learner1 = await createUser(
+    "Alice Learner",
+    "alice@demo.com",
+    "password",
+    "learner",
+  );
+
+  const learner2 = await createUser(
+    "Bob Learner",
+    "bob@demo.com",
+    "password",
+    "learner",
+  );
+
+  const learner3 = await createUser(
+    "Charlie Learner",
+    "charlie@demo.com",
+    "password",
+    "learner",
+  );
+
+  // ------------------------
+  // Courses
+  // ------------------------
+  const course = await prisma.course.create({
+    data: {
+      organizationId: org.id,
+      title: "Full Stack Web Development",
+      description: "Learn modern web development with hands-on modules.",
+      code: "FSWD-101",
+      status: "active",
+      coverImageUrl:
+        "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/coverImage/1770727138011-didhee.png",
+    },
   });
 
   // ------------------------
@@ -143,73 +105,53 @@ export async function main() {
   await prisma.module.createMany({
     data: [
       {
-        courseId: course[0].id,
+        courseId: course.id,
         title: "Introduction to Web",
-        description: "Basics of the web and how it works",
+        description: "Basics of the web",
         position: 1,
         startDate: new Date(),
         dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
       {
-        courseId: course[0].id,
+        courseId: course.id,
         title: "HTML & CSS",
-        description: "Build static pages with HTML and CSS",
+        description: "Build static pages",
         position: 2,
         startDate: new Date(),
         dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       },
-      {
-        courseId: course[0].id,
-        title: "JavaScript Basics",
-        description: "Programming fundamentals with JavaScript",
-        position: 3,
-        startDate: new Date(),
-        dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
-      },
     ],
   });
 
   // ------------------------
-  // Assign instructors to course
+  // Assign Instructors
   // ------------------------
   await prisma.courseInstructor.createMany({
     data: [
-      {
-        courseId: course[0].id,
-        instructorId: instructor1.id,
-      },
-      {
-        courseId: course[0].id,
-        instructorId: instructor2.id,
-      },
+      { courseId: course.id, instructorId: instructor1.id },
+      { courseId: course.id, instructorId: instructor2.id },
     ],
   });
 
   // ------------------------
-  // Enroll learners
+  // Enroll Learners
   // ------------------------
   await prisma.enrollment.createMany({
     data: [
       {
-        courseId: course[0].id,
+        courseId: course.id,
         learnerId: learner1.id,
         enrollmentStatus: "enrolled",
         enrolledAt: new Date(),
       },
       {
-        courseId: course[1].id,
-        learnerId: learner1.id,
-        enrollmentStatus: "enrolled",
-        enrolledAt: new Date(),
-      },
-      {
-        courseId: course[0].id,
+        courseId: course.id,
         learnerId: learner2.id,
-        enrollmentStatus: "unenrolled",
-        inviteSentAt: new Date(),
+        enrollmentStatus: "enrolled",
+        enrolledAt: new Date(),
       },
       {
-        courseId: course[0].id,
+        courseId: course.id,
         learnerId: learner3.id,
         enrollmentStatus: "enrolled",
         enrolledAt: new Date(),
@@ -218,45 +160,123 @@ export async function main() {
   });
 
   // ------------------------
-  // Group conversation
+  // Group Conversation
   // ------------------------
   const groupConversation = await prisma.conversation.create({
     data: {
-      courseId: course[0].id,
-      type: "group",
+      courseId: course.id,
+      type: "GROUP",
     },
   });
 
   await prisma.conversationMember.createMany({
     data: [
-      { conversationId: groupConversation.id, userId: instructor1.id },
-      { conversationId: groupConversation.id, userId: learner1.id },
-      { conversationId: groupConversation.id, userId: learner3.id },
+      {
+        conversationId: groupConversation.id,
+        userId: instructor1.id,
+        lastReadAt: new Date(),
+      },
+      {
+        conversationId: groupConversation.id,
+        userId: learner1.id,
+        lastReadAt: new Date(Date.now() - 1000 * 60 * 60 * 3),
+      },
+      {
+        conversationId: groupConversation.id,
+        userId: learner2.id,
+        lastReadAt: new Date(),
+      },
+      {
+        conversationId: groupConversation.id,
+        userId: learner3.id,
+        lastReadAt: new Date(),
+      },
     ],
   });
 
-  const modules = await prisma.module.findMany({
-    where: {
-      courseId: course[0].id,
+  await prisma.message.createMany({
+    data: [
+      {
+        conversationId: groupConversation.id,
+        senderId: instructor1.id,
+        content: "Welcome everyone to the course!",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 6),
+      },
+      {
+        conversationId: groupConversation.id,
+        senderId: learner1.id,
+        content: "Excited to start 🚀",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5),
+      },
+      {
+        conversationId: groupConversation.id,
+        senderId: instructor1.id,
+        content: "Please review Module 1 this week.",
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2),
+      },
+    ],
+  });
+
+  // ------------------------
+  // Direct Conversation
+  // ------------------------
+  const directConversation = await prisma.conversation.create({
+    data: {
+      courseId: course.id,
+      type: "DIRECT",
     },
-    orderBy: { position: "asc" },
   });
 
-  await prisma.submission.createMany({
-    data: modules.map((m) => ({
-      moduleId: m.id,
-      learnerId: learner1.id,
-      attemptNumber: 1,
-      fileUrl:
-        "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/submissions/Resume_Didheemose.pdf",
-      fileName: "submissions/Resume_Didheemose.pdf",
-      fileSize: 80,
-
-      submittedAt: new Date(),
-      isLate: false,
-      status: "submitted",
-    })),
+  await prisma.conversationMember.createMany({
+    data: [
+      {
+        conversationId: directConversation.id,
+        userId: learner1.id,
+        lastReadAt: new Date(),
+      },
+      {
+        conversationId: directConversation.id,
+        userId: instructor1.id,
+        lastReadAt: new Date(),
+      },
+    ],
   });
+
+  await prisma.message.createMany({
+    data: [
+      {
+        conversationId: directConversation.id,
+        senderId: learner1.id,
+        content: "Hi, I have a question about Module 2.",
+        createdAt: new Date(Date.now() - 1000 * 60 * 30),
+      },
+      {
+        conversationId: directConversation.id,
+        senderId: instructor1.id,
+        content: "Sure, please ask.",
+        createdAt: new Date(Date.now() - 1000 * 60 * 10),
+      },
+    ],
+  });
+
+  const conversations = await prisma.conversation.findMany();
+
+  for (const conv of conversations) {
+    const lastMsg = await prisma.message.findFirst({
+      where: { conversationId: conv.id },
+      orderBy: { createdAt: "desc" },
+    });
+
+    if (lastMsg) {
+      await prisma.conversation.update({
+        where: { id: conv.id },
+        data: {
+          lastMessageId: lastMsg.id,
+          lastMessageAt: lastMsg.createdAt,
+        },
+      });
+    }
+  }
 
   console.log("✅ Seed completed successfully");
 }

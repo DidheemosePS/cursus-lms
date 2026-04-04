@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 import { promisify } from "util";
 import { getIronSession } from "iron-session";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export async function signin(email: string, password: string) {
   try {
@@ -15,7 +15,7 @@ export async function signin(email: string, password: string) {
     const isValid = await verifyPassword(
       password,
       user.passwordHash,
-      user.salt
+      user.salt,
     );
 
     if (!isValid) return { success: false, error: "Invalid email or password" };
@@ -28,6 +28,7 @@ export async function signin(email: string, password: string) {
         email: user.email,
         role: user.role,
         organizationId: user.organizationId,
+        avatar: user.avatar,
       },
     };
   } catch (error) {
@@ -42,7 +43,7 @@ const KEY_LENGTH = 64;
 export async function verifyPassword(
   password: string,
   hash: string,
-  salt: string
+  salt: string,
 ) {
   const derivedKey = (await scryptAsync(password, salt, KEY_LENGTH)) as Buffer;
   return crypto.timingSafeEqual(Buffer.from(hash, "hex"), derivedKey);
@@ -56,12 +57,13 @@ export async function hashPassword(password: string) {
 }
 
 export type SessionData = {
-  userId?: string;
-  name?: string;
-  email?: string;
-  role?: string;
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
   organizationId: string;
   isLoggedIn: boolean;
+  avatar: string;
 };
 
 export const sessionOptions = {
@@ -79,7 +81,7 @@ export const getSession = async () => {
   const cookieStore = await cookies();
   const session = await getIronSession<SessionData>(
     cookieStore,
-    sessionOptions
+    sessionOptions,
   );
 
   if (!session.isLoggedIn) {

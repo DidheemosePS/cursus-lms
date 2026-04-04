@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@/lib/auth/auth";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 import { revalidateTag } from "next/cache";
 import { ModulesProps } from "./modules";
 

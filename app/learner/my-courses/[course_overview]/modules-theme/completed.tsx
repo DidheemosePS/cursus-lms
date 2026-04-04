@@ -17,7 +17,10 @@ export default async function Completed({ module }: { module: Module }) {
   const submissionDate = timeStampStyling(lastSubmission.updatedAt);
 
   return (
-    <div className="bg-white rounded-lg border border-green-100 p-5 md:p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center">
+    <div
+      id={module.id}
+      className="bg-white rounded-lg border border-green-100 p-5 md:p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center"
+    >
       <div className="size-12 rounded-full bg-green-100 text-green-500 flex items-center justify-center">
         <CircleTick className="size-5" />
       </div>

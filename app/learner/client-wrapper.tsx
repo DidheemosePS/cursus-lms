@@ -1,6 +1,6 @@
 "use client";
 
-import { Activity, useState } from "react";
+import { Activity, ReactNode, useState } from "react";
 import Sidebar from "@/components/navigation/side-bar";
 import LearnerNav from "@/components/navigation/learner-nav";
 import Dashboard from "@/assets/icons/dashboard.svg";
@@ -11,13 +11,12 @@ import Question from "@/assets/icons/question.svg";
 import type { NAV_LINK } from "@/components/navigation/side-bar";
 import type { SessionData } from "@/lib/auth/auth";
 
-export default function Page({
-  children,
-  session,
-}: {
-  children: React.ReactNode;
+interface ClientWrapperProps {
+  children: ReactNode;
   session: SessionData;
-}) {
+}
+
+export default function Page({ children, session }: ClientWrapperProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const NAV_LINKS: NAV_LINK[] = [

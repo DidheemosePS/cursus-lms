@@ -28,10 +28,10 @@ export default function InstructorsItem({
     <div className="w-full flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors group">
       <div className="flex items-center gap-3">
         <Image
-          src={AVATAR_URL}
+          src={instructor.avatar ?? AVATAR_URL}
           width={32}
           height={32}
-          alt={instructor?.name}
+          alt={instructor.name}
           className="rounded-full bg-white overflow-hidden"
         />
         <div>

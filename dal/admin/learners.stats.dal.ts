@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export async function getLearnerStatsByOrganization(organizationId: string) {
   const [
@@ -25,7 +25,7 @@ export async function getLearnerStatsByOrganization(organizationId: string) {
         organizationId,
         role: "learner",
         status: "active",
-        enrollments: { some: { status: "enrolled" } },
+        enrollments: { some: { enrollmentStatus: "enrolled" } },
       },
     }),
     prisma.user.count({
@@ -33,7 +33,7 @@ export async function getLearnerStatsByOrganization(organizationId: string) {
         organizationId,
         role: "learner",
         status: "active",
-        enrollments: { some: { status: "unenrolled" } },
+        enrollments: { some: { enrollmentStatus: "unenrolled" } },
       },
     }),
   ]);

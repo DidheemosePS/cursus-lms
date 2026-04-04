@@ -8,20 +8,13 @@ export default async function LearnerLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
+
   if (!session || !session.isLoggedIn || session.role !== "learner") {
     redirect("/login");
   }
+
   return (
-    <ClientWrapper
-      session={{
-        userId: session.userId,
-        organizationId: session.organizationId,
-        name: session.name,
-        email: session.email,
-        role: session.role,
-        isLoggedIn: session.isLoggedIn,
-      }}
-    >
+    <ClientWrapper session={JSON.parse(JSON.stringify(session))}>
       {children}
     </ClientWrapper>
   );

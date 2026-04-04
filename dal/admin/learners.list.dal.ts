@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export async function getLearnersEnrollmentList(organizationId: string) {
   return await prisma.user.findMany({
@@ -19,7 +19,7 @@ export async function getLearnersEnrollmentList(organizationId: string) {
 
       enrollments: {
         select: {
-          status: true,
+          enrollmentStatus: true,
           enrolledAt: true,
         },
       },

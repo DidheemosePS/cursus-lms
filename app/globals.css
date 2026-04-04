@@ -50,3 +50,21 @@ body {
   height: 100%;
   overscroll-behavior: none;
 }
+
+@layer components {
+  .new-chat-icon {
+    anchor-name: --new-chat-icon;
+  }
+
+  .new-chat {
+    position: absolute;
+    position-anchor: --new-chat-icon;
+    inset: auto;
+    top: anchor(bottom);
+    right: anchor(right);
+  }
+
+  .new-chat:popover-open {
+    display: flex;
+  }
+}

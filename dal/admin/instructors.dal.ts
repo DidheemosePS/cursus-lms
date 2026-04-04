@@ -1,4 +1,4 @@
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export async function getInstructorsByOrganization(organizationId: string) {
   return await prisma.user.findMany({

@@ -1,6 +1,6 @@
 "use server";
 
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 
 export async function addInstructorToCourse(
   courseId: string,

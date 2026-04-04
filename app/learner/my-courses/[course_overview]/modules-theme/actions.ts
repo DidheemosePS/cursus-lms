@@ -1,7 +1,7 @@
 "use server";
 
 import { getSession } from "@/lib/auth/auth";
-import prisma from "@/lib/prisma";
+import prisma from "@/lib/prisma.init";
 import S3Upload from "@/lib/s3/s3.upload";
 import { updateTag } from "next/cache";
 
