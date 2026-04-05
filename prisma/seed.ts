@@ -27,6 +27,7 @@ export async function main() {
     email: string,
     password: string,
     role: "admin" | "instructor" | "learner",
+    avatar: string,
   ) => {
     const hash = await hashPassword(password);
     return prisma.user.create({
@@ -38,6 +39,7 @@ export async function main() {
         salt: hash.salt,
         role,
         status: "active",
+        avatar,
       },
     });
   };
@@ -47,6 +49,7 @@ export async function main() {
     "admin@demo.com",
     "password",
     "admin",
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(1).png",
   );
 
   const instructor1 = await createUser(
@@ -54,6 +57,7 @@ export async function main() {
     "sarah@demo.com",
     "password",
     "instructor",
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(2).png",
   );
 
   const instructor2 = await createUser(
@@ -61,6 +65,7 @@ export async function main() {
     "john@demo.com",
     "password",
     "instructor",
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(3).png",
   );
 
   const learner1 = await createUser(
@@ -68,6 +73,7 @@ export async function main() {
     "alice@demo.com",
     "password",
     "learner",
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(4).png",
   );
 
   const learner2 = await createUser(
@@ -75,6 +81,7 @@ export async function main() {
     "bob@demo.com",
     "password",
     "learner",
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(5).png",
   );
 
   const learner3 = await createUser(
@@ -82,6 +89,7 @@ export async function main() {
     "charlie@demo.com",
     "password",
     "learner",
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(6).png",
   );
 
   // ------------------------

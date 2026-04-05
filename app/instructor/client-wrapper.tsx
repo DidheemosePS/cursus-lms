@@ -2,10 +2,10 @@
 
 import { Activity, useState } from "react";
 import Sidebar from "@/components/navigation/side-bar";
-import LearnerNav from "@/components/navigation/learner-nav";
+import LearnerNav from "@/components/navigation/nav-bar";
 import Dashboard from "@/assets/icons/dashboard.svg";
 import MyCourse from "@/assets/icons/books.svg";
-import Message from "@/assets/icons/messages.svg";
+import Chat from "@/assets/icons/chats.svg";
 import Settings from "@/assets/icons/settings.svg";
 import Question from "@/assets/icons/question.svg";
 import Group from "@/assets/icons/group.svg";
@@ -53,9 +53,9 @@ export default function Page({
     },
     {
       id: 5,
-      href: "/instructor/messages",
-      label: "Messages",
-      icon: Message,
+      href: "/instructor/Chats",
+      label: "Chats",
+      icon: Chat,
       section: "top",
     },
     {

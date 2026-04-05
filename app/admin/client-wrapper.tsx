@@ -2,7 +2,7 @@
 
 import { Activity, useState } from "react";
 import Sidebar from "@/components/navigation/side-bar";
-import LearnerNav from "@/components/navigation/learner-nav";
+import LearnerNav from "@/components/navigation/nav-bar";
 import Dashboard from "@/assets/icons/dashboard.svg";
 import MyCourse from "@/assets/icons/books.svg";
 import Settings from "@/assets/icons/settings.svg";

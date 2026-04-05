@@ -4,7 +4,7 @@ import Image from "next/image";
 import Burger from "@/assets/icons/burger.svg";
 import { SessionData } from "@/lib/auth/auth";
 
-export default function LearnerNav({
+export default function NavBar({
   isOpen,
   setIsOpen,
   session,
@@ -17,7 +17,7 @@ export default function LearnerNav({
     "https://epearlacademy.com/pluginfile.php/1/theme_alpha/alphasettingsimgs/0/finallogo.png";
 
   const DEFAULT_AVATAR =
-    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars(6).png";
+    "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars.png";
 
   return (
     <header className="h-16 flex justify-between items-center border-b border-[#f0f2f4] bg-white px-4 shadow-md">

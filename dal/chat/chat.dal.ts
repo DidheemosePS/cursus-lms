@@ -1,10 +1,10 @@
-"use server";
 import { getSession } from "@/lib/auth/auth";
 import prisma from "@/lib/prisma.init";
+import { redirect } from "next/navigation";
 
 export async function getChatList() {
   const { userId } = await getSession();
-  if (!userId) return [];
+  if (!userId) redirect("/login");
 
   return await prisma.conversation.findMany({
     where: {
@@ -38,7 +38,7 @@ export async function getChatList() {
 
 export async function getSuggestedInstructors(chattedInstructorIds: string[]) {
   const { userId } = await getSession();
-  if (!userId) return [];
+  if (!userId) redirect("/login");
 
   return await prisma.user.findMany({
     where: {
@@ -88,9 +88,56 @@ export async function getSuggestedInstructors(chattedInstructorIds: string[]) {
   });
 }
 
+// Returns learners enrolled in any course this instructor teaches,
+// grouped so each learner appears once per course they share.
+export async function getSuggestedLearners() {
+  const { userId } = await getSession();
+  if (!userId) return [];
+
+  // Get all courses this instructor teaches
+  const instructedCourses = await prisma.courseInstructor.findMany({
+    where: { instructorId: userId },
+    select: { courseId: true },
+  });
+
+  const courseIds = instructedCourses.map((c) => c.courseId);
+  if (courseIds.length === 0) return [];
+
+  // Get all active learners enrolled in those courses
+  const enrollments = await prisma.enrollment.findMany({
+    where: {
+      courseId: { in: courseIds },
+      enrollmentStatus: "enrolled",
+    },
+    select: {
+      courseId: true,
+      course: { select: { id: true, title: true } },
+      learner: {
+        select: { id: true, name: true, avatar: true },
+      },
+    },
+  });
+
+  // Deduplicate: one entry per learner, keeping first course found
+  const seen = new Set<string>();
+  return enrollments
+    .filter(({ learner }) => {
+      if (seen.has(learner.id)) return false;
+      seen.add(learner.id);
+      return true;
+    })
+    .map(({ learner, course }) => ({
+      id: learner.id,
+      name: learner.name,
+      avatar: learner.avatar,
+      courseId: course.id,
+      courseTitle: course.title,
+    }));
+}
+
 export async function getChatMessages(conversationId: string) {
   const { userId } = await getSession();
-  if (!userId) return;
+  if (!userId) redirect("/login");
 
   return await prisma.conversation.findUnique({
     where: { id: conversationId, members: { some: { userId } } },

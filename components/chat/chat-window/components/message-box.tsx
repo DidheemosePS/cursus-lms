@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { timeStampStyling } from "@/utils/timestamp-formatter";
-import { ChatMessagesProps } from "./chat-messages";
+import { ChatMessagesProps } from "../../types/chat.types";
 
 export function MessageBoxLeft({ message }: { message: ChatMessagesProps }) {
   const { timePart } = timeStampStyling(message.createdAt);

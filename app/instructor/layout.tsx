@@ -20,6 +20,7 @@ export default async function LearnerLayout({
         email: session.email,
         role: session.role,
         isLoggedIn: session.isLoggedIn,
+        avatar: session.avatar,
       }}
     >
       {children}

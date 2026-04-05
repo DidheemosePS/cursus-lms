@@ -1,6 +1,6 @@
 "use server";
 
-import { sendMessage } from "@/dal/learners/message/chat.dal";
+import { sendMessage } from "@/dal/chat/chat.dal";
 import { getSession } from "@/lib/auth/auth";
 import prisma from "@/lib/prisma.init";
 import { pusher } from "@/lib/pusher.init";
@@ -18,10 +18,13 @@ export async function markAsRead(conversationId: string) {
 
 export async function handleChatInput(chatId: string, formData: FormData) {
   const { userId } = await getSession();
+
   const content = formData.get("chat-input")?.toString();
+
   if (!content || !chatId || !userId) return;
 
   const sendMessageRes = await sendMessage(chatId, content);
+
   if (!sendMessageRes) return;
 
   pusher.trigger(`chat-${chatId}`, "new-message", sendMessageRes.newMessage);
@@ -39,7 +42,12 @@ export async function handleChatInput(chatId: string, formData: FormData) {
   await Promise.all(notifications);
 }
 
-export async function startDirectChat(instructorId: string, courseId: string) {
+export async function startDirectChat(
+  targetId: string,
+  courseId: string,
+  baseRoute: string,
+) {
+  // targetId - id of the person chatting with, not the logged userId
   const { userId } = await getSession();
   if (!userId) redirect("/login");
 
@@ -51,7 +59,7 @@ export async function startDirectChat(instructorId: string, courseId: string) {
       courseId,
       members: { some: { userId } },
       AND: {
-        members: { some: { userId: instructorId } },
+        members: { some: { userId: targetId } },
       },
     },
     select: { id: true },
@@ -59,7 +67,7 @@ export async function startDirectChat(instructorId: string, courseId: string) {
 
   if (existing) {
     // Already exists — just open it
-    redirect(`/learner/messages?chat-id=${existing.id}`);
+    redirect(`${baseRoute}?chat-id=${existing.id}`);
   }
 
   // Create the conversation and add both members in one transaction
@@ -69,10 +77,7 @@ export async function startDirectChat(instructorId: string, courseId: string) {
         type: "DIRECT",
         courseId,
         members: {
-          create: [
-            { userId }, // learner
-            { userId: instructorId }, // instructor
-          ],
+          create: [{ userId }, { userId: targetId }],
         },
       },
       select: { id: true },
@@ -81,5 +86,5 @@ export async function startDirectChat(instructorId: string, courseId: string) {
     return convo;
   });
 
-  redirect(`/learner/messages?chat-id=${conversation.id}`);
+  redirect(`${baseRoute}?chat-id=${conversation.id}`);
 }
