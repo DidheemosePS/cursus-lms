@@ -53,7 +53,7 @@ export default function Page({
     },
     {
       id: 5,
-      href: "/instructor/Chats",
+      href: "/instructor/chats",
       label: "Chats",
       icon: Chat,
       section: "top",

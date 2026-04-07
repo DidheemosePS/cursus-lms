@@ -2,7 +2,7 @@
 
 import { use, useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useDebounce } from "@/hooks/use-debounce-value";
 import { reorder } from "./actions";
 import AddNewModules from "../add-new-modules/add-new-modules";
 import ModulesHeader from "./modules-header";

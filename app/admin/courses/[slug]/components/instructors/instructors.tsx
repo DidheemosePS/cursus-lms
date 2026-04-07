@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useCallback, useEffect, useMemo, useState } from "react";
-import { useDebounce } from "@/hooks/use-debounce";
+import { useDebounce } from "@/hooks/use-debounce-value";
 import { useParams } from "next/navigation";
 import Header from "./header";
 import SearchSection from "./search-section";
