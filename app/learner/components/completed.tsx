@@ -3,7 +3,7 @@ import View from "@/assets/icons/view.svg";
 import Star from "@/assets/icons/star.svg";
 import CheckList from "@/assets/icons/check-list.svg";
 import Link from "next/link";
-import { getCompletedSubmissions } from "@/dal/learners/overview/overview.dal";
+import { getCompletedSubmissions } from "@/dal/learners/overview.dal";
 
 // Theme
 const completed_work_theme = {

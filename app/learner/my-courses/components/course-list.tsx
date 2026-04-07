@@ -1,25 +1,38 @@
+import { CourseEnrollment } from "@/dal/learners/courses";
 import CourseCard from "./course-card";
 
-export interface Courses {
-  course: {
-    id: string;
-    title: string;
-    description: string;
-    coverImageUrl: string;
-    _count: {
-      modules: number;
+export default function CourseList({
+  courseList,
+  activeFilter,
+}: {
+  courseList: CourseEnrollment[];
+  activeFilter?: string;
+}) {
+  if (courseList.length === 0) {
+    const emptyMessages: Record<string, string> = {
+      in_progress: "You have no courses in progress.",
+      not_started: "You have no courses yet to start.",
+      completed: "You haven't completed any courses yet.",
     };
-  };
-  progressStatus: "in_progress" | "not_started" | "completed";
-  progressPercent: number;
-}
+    const message =
+      emptyMessages[activeFilter ?? ""] ??
+      "You are not enrolled in any courses yet.";
 
-export default function CourseList({ courseList }: { courseList: Courses[] }) {
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-center">
+        <p className="text-base font-semibold text-[#111318]">
+          Nothing here yet
+        </p>
+        <p className="mt-1 text-sm text-[#616f89]">{message}</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-8">
-      {courseList?.map((courses: Courses) => {
-        return <CourseCard key={courses.course.id} courses={courses} />;
-      })}
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6">
+      {courseList.map((enrollment) => (
+        <CourseCard key={enrollment.course.id} enrollment={enrollment} />
+      ))}
     </div>
   );
 }

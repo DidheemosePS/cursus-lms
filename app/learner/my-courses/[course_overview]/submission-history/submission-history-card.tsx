@@ -1,5 +1,4 @@
 "use client";
-
 import Tick from "@/assets/icons/circle-tick.svg";
 import Calendar from "@/assets/icons/calendar-check.svg";
 import Download from "@/assets/icons/download.svg";
@@ -11,7 +10,7 @@ import Link from "next/link";
 import { timeStampStyling } from "@/utils/timestamp-formatter";
 import { formatFileSize } from "@/utils/format-file-size";
 import { ACCEPTED_FILE_TYPES } from "../modules-theme/submission-form";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import { updateSubmission } from "./action";
 import { validateFile } from "@/lib/s3/s3.utils";
 import { useParams } from "next/navigation";
@@ -19,29 +18,24 @@ import { useParams } from "next/navigation";
 const colors = {
   submitted: "bg-blue-100 text-blue-500",
   reviewed: "bg-green-100 text-green-500",
-  resubmit: "bg-orange-100 text-orange-500",
 } as const;
 
 export default function SubmissionHistoryCard({
-  stage,
   submission,
-  error,
-  setError,
 }: {
-  stage: keyof typeof colors;
   submission: Submission;
-  error: string | null;
-  setError: Dispatch<SetStateAction<string | null>>;
 }) {
   const { course_overview } = useParams<{ course_overview: string }>();
-
-  const stageTheme = colors[stage] ?? "bg-gray-100 text-gray-500";
-
-  const { datePart, timePart } = timeStampStyling(submission.updatedAt); //  To style like this Oct 28, 2023 02:15 PM
-
+  const stageTheme =
+    colors[submission.status as keyof typeof colors] ??
+    "bg-gray-100 text-gray-500";
+  const { datePart, timePart } = timeStampStyling(submission.updatedAt);
   const downloadSize = formatFileSize(submission.fileSize);
 
+  // Each card owns its own state — no shared error prop
   const [isPending, setIsPending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
 
   async function handleUpdateSubmission(
     event: ChangeEvent<HTMLInputElement>,
@@ -50,14 +44,14 @@ export default function SubmissionHistoryCard({
   ) {
     try {
       const files = event.currentTarget.files;
-      if (!files) throw new Error("No file selected");
+      if (!files || files.length === 0) throw new Error("No file selected");
       if (!submissionId) throw new Error("Submission ID missing");
       if (!previousUrl) throw new Error("File url missing");
 
       setIsPending(true);
+      setError(null);
 
       const fileValidation = validateFile(files[0]);
-
       if (!fileValidation.valid)
         throw new Error(fileValidation.error || "Invalid file");
 
@@ -71,64 +65,82 @@ export default function SubmissionHistoryCard({
       if (!actionRes.success)
         throw new Error(actionRes.message || "File submission failed");
 
-      // Toast
-      console.log(actionRes);
-    } catch (error) {
-      if (error instanceof Error)
-        setError(error.message || "Something went wrong");
+      setSuccess(true);
+    } catch (err) {
+      if (err instanceof Error) setError(err.message || "Something went wrong");
     } finally {
       setIsPending(false);
     }
   }
 
   return (
-    <div className="group flex items-start gap-4 p-4 rounded-xl border border-gray-500/20 hover:shadow-md transition-all">
+    <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 hover:shadow-sm transition-all">
+      {/* Status icon */}
       <div
-        className={`size-10 rounded-full ${stageTheme} flex items-center justify-center`}
+        className={`size-10 rounded-full ${stageTheme} flex items-center justify-center shrink-0`}
       >
         <Tick className="size-5" />
       </div>
-      <div className="flex-1">
-        <p className="font-bold">Attempt {submission.attemptNumber}</p>
-        <div className="text-sm text-[#616f89] mb-3 flex items-center gap-1">
-          <Calendar className="size-4" />
+
+      <div className="flex-1 min-w-0">
+        {/* Attempt + date */}
+        <p className="font-bold text-[#111318] text-sm">
+          Attempt {submission.attemptNumber}
+        </p>
+        <div className="text-xs text-[#616f89] mb-2 flex items-center gap-1.5">
+          <Calendar className="size-3.5 shrink-0" />
           <span>
-            Submitted on {datePart} • {timePart}
+            Submitted on {datePart} · {timePart}
           </span>
         </div>
-        <div className="flex gap-4">
+
+        {/* File name */}
+        {submission.fileName && (
+          <p className="text-xs text-[#617789] truncate mb-2">
+            {submission.fileName}
+          </p>
+        )}
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-4 items-center">
           <Link
             href={submission.fileUrl}
             target="_blank"
-            className="shrink-0 flex items-center gap-2 text-gray-500 cursor-pointer hover:underline"
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:underline"
           >
-            <Eye className="size-4.5" />
-            <span className="text-xs">Preview</span>
+            <Eye className="size-4" />
+            Preview
           </Link>
+
           <a
             href={submission.fileUrl}
             download
             target="_blank"
-            className="shrink-0 flex items-center gap-2 text-gray-500 cursor-pointer hover:underline"
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:underline"
           >
-            <Download className="size-4.5" />
-            <span className="text-xs">Download ({downloadSize})</span>
+            <Download className="size-4" />
+            Download ({downloadSize})
           </a>
-          {submission.status === "submitted" && (
+
+          {/* Update — only on submitted, not reviewed, not after success */}
+          {submission.status === "submitted" && !success && (
             <>
               <label
-                htmlFor={submission.id}
-                className={`shrink-0 px-2.5 py-1 ${stageTheme} rounded-lg flex items-center gap-2 ${isPending ? "cursor-not-allowed opacity-50" : "cursor-pointer hover:underline"}`}
+                htmlFor={`update-${submission.id}`}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold ${stageTheme} ${
+                  isPending
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer hover:opacity-80"
+                }`}
               >
-                <File className="size-4.5" />
-                <span className="text-sm font-bold">Update Submission</span>
+                <File className="size-3.5" />
+                Update Submission
               </label>
               <input
                 hidden
-                id={submission.id}
+                id={`update-${submission.id}`}
                 type="file"
                 accept={ACCEPTED_FILE_TYPES.join(",")}
-                name="update-submission-file"
                 onChange={(e) =>
                   handleUpdateSubmission(e, submission.id, submission.fileUrl)
                 }
@@ -136,21 +148,28 @@ export default function SubmissionHistoryCard({
               />
             </>
           )}
+
+          {success && (
+            <span className="text-xs font-bold text-green-600">
+              ✓ Updated successfully
+            </span>
+          )}
         </div>
+
+        {/* Error — isolated to this card only */}
         {error && (
-          <span className="flex items-center gap-1 text-xs text-red-600 mt-1">
+          <span className="flex items-center gap-1 text-xs text-red-600 mt-2">
             <Warning className="size-3 shrink-0" />
-            <span>{error}</span>
+            {error}
           </span>
         )}
       </div>
+
+      {/* Status badge */}
       <span
-        className={`px-2.5 py-1 rounded-lg text-xs font-bold ${stageTheme}`}
+        className={`px-2.5 py-1 rounded-lg text-xs font-bold shrink-0 ${stageTheme}`}
       >
-        {submission.status
-          ? submission.status.charAt(0).toUpperCase() +
-            submission.status.slice(1)
-          : ""}
+        {submission.status.charAt(0).toUpperCase() + submission.status.slice(1)}
       </span>
     </div>
   );

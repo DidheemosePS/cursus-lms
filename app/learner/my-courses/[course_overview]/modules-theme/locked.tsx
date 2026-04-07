@@ -12,13 +12,10 @@ export default function Locked({
   module: Module;
 }) {
   const startDate = timeStampStyling(module.startDate);
-  const dueDate = timeStampStyling(module.startDate);
+  const dueDate = timeStampStyling(module.dueDate);
 
   return (
-    <div
-      id={module.id}
-      className="bg-white rounded-lg border border-gray-100 p-5 md:p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center opacity-75"
-    >
+    <div className="bg-white rounded-lg border border-gray-100 p-5 md:p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center opacity-75">
       <div className="size-12 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center">
         <Lock className="size-5" />
       </div>

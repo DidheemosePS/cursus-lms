@@ -2,7 +2,7 @@ import PendingIcon from "@/assets/icons/pending.svg";
 import File from "@/assets/icons/file.svg";
 import Upload from "@/assets/icons/upload.svg";
 import Link from "next/link";
-import { getPendingModules } from "@/dal/learners/overview/overview.dal";
+import { getPendingModules } from "@/dal/learners/overview.dal";
 
 // Component
 export default async function Pending() {

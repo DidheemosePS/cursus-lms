@@ -13,10 +13,7 @@ export default async function Current({ module }: { module: Module }) {
   const dueIn = formatTimeAgo(module.dueDate, "day");
 
   return (
-    <div
-      id={module.id}
-      className="bg-white rounded-lg border border-blue-100 border-l-4 border-l-blue-500 p-5 md:p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center transform scale-[1.01]"
-    >
+    <div className="bg-white rounded-lg border border-blue-100 border-l-4 border-l-blue-500 p-5 md:p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center transform scale-[1.01]">
       <div className="size-12 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center">
         <Play className="size-5" />
       </div>

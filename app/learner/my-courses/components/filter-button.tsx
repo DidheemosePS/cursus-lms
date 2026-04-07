@@ -6,7 +6,14 @@ export interface FilterButtonProps {
   currentStatus?: string;
 }
 
-export default async function FilterButton({
+const LABELS: Record<Status | "all", string> = {
+  all: "All",
+  in_progress: "In Progress",
+  not_started: "Not Started",
+  completed: "Completed",
+};
+
+export default function FilterButton({
   label,
   currentStatus,
 }: FilterButtonProps) {
@@ -15,16 +22,19 @@ export default async function FilterButton({
       ? "/learner/my-courses"
       : `/learner/my-courses?progress_status=${label}`;
 
+  // "all" is active when no status param is set
+  const isActive = label === "all" ? !currentStatus : currentStatus === label;
+
   return (
     <Link
       href={href}
-      className={`flex items-center justify-center px-4 py-2 rounded-lg ${
-        currentStatus === label
-          ? "bg-[#111318] text-white transition-opacity hover:opacity-90"
-          : "bg-white text-[#111318] border border-[#e5e7eb] transition-colors hover:bg-gray-200"
-      } text-sm font-medium cursor-pointer`}
+      className={`flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+        isActive
+          ? "bg-[#111318] text-white hover:opacity-90"
+          : "bg-white text-[#111318] border border-[#e5e7eb] hover:bg-gray-100"
+      }`}
     >
-      {label.charAt(0).toUpperCase() + label.slice(1).replace(/_/g, " ")}{" "}
+      {LABELS[label]}
     </Link>
   );
 }

@@ -1,7 +1,7 @@
 import Graph from "@/assets/icons/graph.svg";
 import View from "@/assets/icons/view.svg";
 import Continue from "@/assets/icons/continue.svg";
-import { getProgression } from "@/dal/learners/overview/overview.dal";
+import { getProgression } from "@/dal/learners/overview.dal";
 
 // Theme
 const progression_card_theme = {
