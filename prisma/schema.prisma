@@ -150,7 +150,6 @@ model Enrollment {
 
   enrollmentStatus       EnrollmentStatus
   progressStatus ProgressStatus @default(not_started)
-  progressPercent Float @default(0)
   completedModules Int @default(0)
   lastProgressAt DateTime?
 

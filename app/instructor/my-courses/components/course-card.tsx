@@ -27,7 +27,7 @@ export function CourseCard({ course }: CourseCardProps) {
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         {/* Subtle gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/30 to-transparent" />
 
         {/* Course code badge — sits over image bottom-left */}
         <span className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 text-amber-700 border border-amber-200 backdrop-blur-sm">

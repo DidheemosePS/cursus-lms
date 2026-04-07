@@ -57,13 +57,6 @@ export async function handleSubmission(
   const updatedCompleted =
     totalModulesCompleted + (attemptNumber === 1 ? 1 : 0);
 
-  const progressPercent =
-    totalModules === 0
-      ? 0
-      : Math.round(
-          ((updatedCompleted / totalModules) * 100 + Number.EPSILON) * 100,
-        ) / 100;
-
   // DB transaction for submission + progress update
   try {
     await prisma.$transaction(async (tx) => {
@@ -88,8 +81,7 @@ export async function handleSubmission(
         },
         data: {
           progressStatus: "in_progress",
-          progressPercent,
-          completedModules: totalModulesCompleted,
+          completedModules: updatedCompleted,
           lastProgressAt: new Date(),
         },
       });
