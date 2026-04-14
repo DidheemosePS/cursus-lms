@@ -58,7 +58,7 @@ function SideBar({ NAV_LINKS }: SideBarProps) {
   const handleSignOut = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
-      router.push("/login");
+      window.location.href = "/login"; // hard navigation — bypasses intercepting route
     } catch (error) {
       console.error("Logout failed:", error);
     }

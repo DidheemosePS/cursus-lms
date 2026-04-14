@@ -3,12 +3,10 @@
 import Eye from "@/assets/icons/eye.svg";
 import EyeOff from "@/assets/icons/eyeoff.svg";
 import { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { signInSchema } from "@/lib/validation/signin";
 
 export default function LoginForm() {
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<{
@@ -21,8 +19,8 @@ export default function LoginForm() {
     event.preventDefault();
     setIsLoading(true);
     setErrors({});
-    const formData = new FormData(event.currentTarget);
 
+    const formData = new FormData(event.currentTarget);
     const parsed = signInSchema.safeParse({
       email: formData.get("email"),
       password: formData.get("password"),
@@ -52,9 +50,12 @@ export default function LoginForm() {
         return;
       }
 
-      router.push(`/${response.user.role}`);
+      // Hard navigation — bypasses intercepting route so modal
+      // doesn't intercept the role-based redirect after login
+      window.location.href = `/${response.user.role}`;
     } catch (error) {
-      console.log("Signin error:", error);
+      console.error("Signin error:", error);
+      setErrors({ invalid: "Something went wrong. Please try again." });
     } finally {
       setIsLoading(false);
     }
@@ -73,8 +74,11 @@ export default function LoginForm() {
           required
           className="mt-2 w-full rounded-lg border bg-transparent px-3 py-2 shadow-sm outline-none focus:border-rose-600"
         />
-        <p className="text-xs mt-2 text-red-600">{errors?.email}</p>
+        {errors?.email && (
+          <p className="text-xs mt-2 text-red-600">{errors.email}</p>
+        )}
       </div>
+
       <div className="relative">
         <label className="font-medium">Password</label>
         <div className="relative">
@@ -91,22 +95,28 @@ export default function LoginForm() {
             className="absolute inset-y-0 right-0 mt-2 mr-3 flex items-center"
           >
             {showPassword ? (
-              <EyeOff size={20} className="text-secondary size-5" />
+              <EyeOff className="text-secondary size-5" />
             ) : (
-              <Eye size={20} className="text-secondary size-5" />
+              <Eye className="text-secondary size-5" />
             )}
           </button>
         </div>
-        <p className="text-xs mt-2 text-red-600">{errors?.password}</p>
+        {errors?.password && (
+          <p className="text-xs mt-2 text-red-600">{errors.password}</p>
+        )}
       </div>
+
       <button
         type="submit"
         disabled={isLoading}
-        className="w-full rounded-lg bg-rose-600 px-4 py-2 font-medium text-white duration-150 hover:bg-rose-500 active:bg-rose-600"
+        className="w-full rounded-lg bg-rose-600 px-4 py-2 font-medium text-white duration-150 hover:bg-rose-500 active:bg-rose-600 disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        {isLoading ? "Signing in..." : "Sign in"}
+        {isLoading ? "Signing in…" : "Sign in"}
       </button>
-      <p className="mx-auto text-xs text-red-600">{errors?.invalid}</p>
+
+      {errors?.invalid && (
+        <p className="mx-auto text-xs text-red-600">{errors.invalid}</p>
+      )}
     </form>
   );
 }

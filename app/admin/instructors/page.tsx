@@ -1,107 +1,116 @@
-import Search from "@/assets/icons/search.svg";
-import Plus from "@/assets/icons/plus.svg";
-import Course from "@/assets/icons/books.svg";
-import Block from "@/assets/icons/block.svg";
-import Image from "next/image";
-import { getSession } from "@/lib/auth/auth";
-import { getInstructorsByOrganization } from "../../../dal/admin/instructors.dal";
-import { avatar } from "../page";
+import { Suspense } from "react";
+import Group from "@/assets/icons/group.svg";
+import CircleTick from "@/assets/icons/circle-tick.svg";
+import Warning from "@/assets/icons/warning.svg";
+import Clock from "@/assets/icons/pending.svg";
+import { getInstructors } from "@/dal/admin/instructors.dal";
+import { InstructorTable } from "./components/instructor-table";
+import InstructorFilters from "./components/instructor-filters";
+import InviteInstructorModal from "./components/invite-modal";
+import { LearnerFooter } from "@/app/instructor/my-learners/components/learner-footer";
 
-export default async function Page() {
-  // Authorization
-  const { organizationId } = await getSession();
+interface PageProps {
+  searchParams: Promise<{
+    search?: string;
+    status?: "active" | "pending_invite" | "inactive";
+    page?: string;
+  }>;
+}
 
-  // Db Call
-  const instructors = await getInstructorsByOrganization(organizationId);
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10));
+
+  const { instructors, total, pageSize, counts } = await getInstructors({
+    search: params.search,
+    status: params.status,
+    page,
+  });
+
+  const statCards = [
+    {
+      title: "Total Instructors",
+      value: counts.all,
+      icon: (
+        <div className="size-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+          <Group className="size-5" />
+        </div>
+      ),
+    },
+    {
+      title: "Active",
+      value: counts.active,
+      icon: (
+        <div className="size-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+          <CircleTick className="size-5" />
+        </div>
+      ),
+    },
+    {
+      title: "Pending Invite",
+      value: counts.pending_invite,
+      icon: (
+        <div className="size-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+          <Clock className="size-5" />
+        </div>
+      ),
+    },
+    {
+      title: "Inactive",
+      value: counts.inactive,
+      icon: (
+        <div className="size-10 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center">
+          <Warning className="size-5" />
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <main className="@container min-h-[calc(100dvh-4rem)] px-4 py-8 md:px-12 space-y-8">
+    <main className="@container min-h-[calc(100dvh-4rem)] px-4 py-8 md:px-12 flex flex-col gap-8">
+      {/* Header */}
       <header className="flex flex-col @3xl:flex-row @3xl:items-end justify-between gap-4">
-        <div>
+        <div className="space-y-1">
           <p className="text-2xl font-bold tracking-tight text-[#111318]">
-            Course Details
+            Instructors
           </p>
-          <p className="mt-1 text-sm text-[#616f89]">
-            Manage course structure, content, and instructors.
+          <p className="text-sm text-[#616f89]">
+            Manage instructors and their course assignments.
           </p>
         </div>
-        <div className="flex flex-col @3xl:flex-row gap-3 w-full @lg:w-auto">
-          <div className="flex-1 @3xl:w-80 flex items-center pl-2 rounded-lg overflow-hidden outline-0 ring ring-gray-200 focus-within:ring-1 focus-within:ring-[#135BEC]">
-            <span className="text-[#617789]">
-              <Search className="size-5" />
-            </span>
-            <input
-              type="text"
-              placeholder="Search to add instructor..."
-              className="flex-1 px-2 py-2.5 text-sm placeholder:text-[#617789] outline-0 focus:ring-0 text-[#111518]"
-            />
-          </div>
-          <button className="flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-[#135BEC] text-white font-bold text-sm shadow-sm hover:bg-[#135BEC]/90 transition-colors">
-            <Plus className="size-5" />
-            <span>Add Instructor</span>
-          </button>
-        </div>
+        <InviteInstructorModal />
       </header>
-      <section className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-6">
-        {instructors?.map((instructor) => {
-          return (
-            <div
-              key={instructor?.id}
-              className="group flex flex-col items-start gap-4 p-5 bg-white rounded-lg border border-gray-100 shadow-sm hover:border-[#135BEC]/30 transition-all cursor-pointer overflow-hidden"
-            >
-              <Image
-                src={avatar}
-                width={100}
-                height={100}
-                alt="avatar"
-                className="size-16 bg-gray-100 rounded-full"
-              />
-              <div>
-                <p className="text-lg font-bold text-[#111318] leading-tight group-hover:text-[#135BEC] transition-colors">
-                  {instructor?.name}
-                </p>
-                <p className="text-sm text-[#8B969E] font-medium mt-1">
-                  {instructor?.email}
-                </p>
-              </div>
-              <div className="flex items-center gap-2">
-                {instructor?._count?.instructedCourses ? (
-                  <div
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 text-xs font-semibold ${
-                      instructor?.status === "active"
-                        ? "text-[#111318]"
-                        : "text-[#8B969E]"
-                    } border border-gray-100`}
-                  >
-                    <Course
-                      className={`size-3.5 ${
-                        instructor?.status === "active"
-                          ? "text-[#135BEC]"
-                          : "text-[#8B969E]"
-                      }`}
-                    />
-                    <span>{instructor?._count?.instructedCourses} Courses</span>
-                  </div>
-                ) : (
-                  <div className="inline-flex items-center text-[#8B969E] gap-1.5 px-2.5 py-1 rounded-md bg-gray-50 text-xs font-semibold border border-gray-100">
-                    <Block className="size-3.5" />
-                    <span>No courses</span>
-                  </div>
-                )}
-                {instructor?.status === "active" ? (
-                  <div className="inline-flex px-2.5 py-1 rounded-md bg-green-50 text-xs font-bold text-green-600 border border-green-100">
-                    Active
-                  </div>
-                ) : (
-                  <div className="inline-flex px-2.5 py-1 rounded-md bg-red-50 text-xs font-bold text-red-600 border border-red-100">
-                    Inactive
-                  </div>
-                )}
-              </div>
+
+      {/* Stat cards */}
+      <section className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+        {statCards.map((card) => (
+          <div
+            key={card.title}
+            className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm flex items-center justify-between hover:border-[#135BEC]/30 transition-colors"
+          >
+            <div className="space-y-1">
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                {card.title}
+              </p>
+              <p className="text-2xl font-bold text-slate-900">{card.value}</p>
             </div>
-          );
-        })}
+            {card.icon}
+          </div>
+        ))}
       </section>
+
+      {/* Filters */}
+      <Suspense>
+        <InstructorFilters counts={counts} />
+      </Suspense>
+
+      {/* Table */}
+      <InstructorTable instructors={instructors} />
+
+      {/* Pagination */}
+      <Suspense>
+        <LearnerFooter total={total} pageSize={pageSize} currentPage={page} />
+      </Suspense>
     </main>
   );
 }

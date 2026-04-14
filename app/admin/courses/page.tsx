@@ -1,107 +1,149 @@
 import Link from "next/link";
+import { Suspense } from "react";
 import Plus from "@/assets/icons/plus.svg";
-import Search from "@/assets/icons/search.svg";
-import Image from "next/image";
-import Group from "@/assets/icons/group.svg";
-import Module from "@/assets/icons/module.svg";
-import Arrow from "@/assets/icons/left-arrow.svg";
-import { getSession } from "@/lib/auth/auth";
-import { getCoursesByOrganization } from "../../../dal/admin/course.dal";
+import Books from "@/assets/icons/books.svg";
+import CircleTick from "@/assets/icons/circle-tick.svg";
+import Edit from "@/assets/icons/edit.svg";
+import Warning from "@/assets/icons/warning.svg";
+import { getCourses } from "@/dal/admin/course.dal";
+import { CourseCard } from "./components/course-card";
+import CourseFilters from "./components/course-filters";
+import { LearnerFooter } from "@/app/instructor/my-learners/components/learner-footer";
 
-export default async function Page() {
-  // Authorization
-  const { organizationId } = await getSession();
+interface PageProps {
+  searchParams: Promise<{
+    search?: string;
+    status?: "draft" | "active" | "archived";
+    page?: string;
+  }>;
+}
 
-  // Db Call
-  const courses = await getCoursesByOrganization(organizationId);
+export default async function Page({ searchParams }: PageProps) {
+  const params = await searchParams;
+  const page = Math.max(1, parseInt(params.page ?? "1", 10));
+
+  const { courses, total, pageSize, counts } = await getCourses({
+    search: params.search,
+    status: params.status,
+    page,
+  });
+
+  const statCards = [
+    {
+      title: "Total Courses",
+      value: counts.all,
+      icon: (
+        <div className="size-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center">
+          <Books className="size-5" />
+        </div>
+      ),
+    },
+    {
+      title: "Active",
+      value: counts.active,
+      icon: (
+        <div className="size-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center">
+          <CircleTick className="size-5" />
+        </div>
+      ),
+    },
+    {
+      title: "Draft",
+      value: counts.draft,
+      icon: (
+        <div className="size-10 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center">
+          <Edit className="size-5" />
+        </div>
+      ),
+    },
+    {
+      title: "Archived",
+      value: counts.archived,
+      icon: (
+        <div className="size-10 rounded-full bg-gray-50 text-gray-500 flex items-center justify-center">
+          <Warning className="size-5" />
+        </div>
+      ),
+    },
+  ];
 
   return (
-    <main className="@container min-h-[calc(100dvh-4rem)] px-4 py-8 md:px-12 space-y-8">
-      <header className="mb-8 flex flex-col @lg:flex-row @lg:items-end justify-between gap-4">
-        <div>
+    <main className="@container min-h-[calc(100dvh-4rem)] px-4 py-8 md:px-12 flex flex-col gap-8">
+      {/* Header */}
+      <header className="flex flex-col @lg:flex-row @lg:items-end justify-between gap-4">
+        <div className="space-y-1">
           <p className="text-2xl font-bold tracking-tight text-[#111318]">
-            Admin Courses
+            Courses
           </p>
-          <p className="mt-1 text-sm text-[#616f89]">
+          <p className="text-sm text-[#616f89]">
             Manage course content, structure, and instructor assignments.
           </p>
         </div>
         <Link
-          href="#"
-          className="flex items-center justify-center gap-2 bg-[#135BEC] hover:bg-[#135BEC]/80 text-white px-5 py-2.5 rounded-lg shadow-sm transition-all"
+          href="/admin/courses/new"
+          className="flex items-center justify-center gap-2 bg-[#135BEC] hover:bg-[#135BEC]/90 text-white px-5 h-10 rounded-lg shadow-sm transition-colors font-bold text-sm shrink-0"
         >
-          <Plus className="size-5" />
-          <span className="font-bold tracking-wide">Create</span>
+          <Plus className="size-4" />
+          <span>Create Course</span>
         </Link>
       </header>
-      {/* Search bar */}
-      <div className="max-w-2xl flex items-center rounded-lg h-10 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-[#135BEC]/50 transition-shadow shadow-sm">
-        <span className="pl-4 pr-2 text-[#617789]">
-          <Search className="size-5" />
-        </span>
-        <input
-          type="text"
-          placeholder="Search courses by name or code..."
-          className="w-full h-full rounded-lg px-2 text-sm placeholder:text-[#617789] outline-0 focus:ring-0 text-[#111518]"
-        />
-      </div>
-      {/* All Courses */}
-      <section className="space-y-4">
-        <p className="text-sm font-bold uppercase tracking-wider text-[#617789]">
-          All Courses
-        </p>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-8">
-          {courses?.map((item) => {
-            return (
-              <div
-                key={item?.id}
-                className="relative group grid place-items-end rounded-lg shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden"
-              >
-                <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAN8NVMBdLUCDOL-663ZGg8PCvEWeWjYgKTm4XOSWqtE9obNGX0DlxdCdi8un3TRgotmExE_LmXAN1o86uakuBzYxXwK_bqSZf7nVXgTZnSk_zXcgqz5WLmWw1BRoJHUFJOOZz0yjI6oeEFVoMflK5RE10qi0srhQ-PfwNSm5G0Hv-7qxrfi-tTqKqH0uBmTWMTFycatxVZJ6bF0efi-eCCNZkBs9VWcWBaOlXz3M7uzUD6Dnz4vgzGhfocU1_OBhpx7osCg5KMyM4"
-                  width={100}
-                  height={100}
-                  alt="logo"
-                  className="w-full rounded-lg shadow-2xl bg-gray-200 col-[1/2] row-[1/2] filter-[brightness(.6)] object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-                <span className="absolute top-3 right-3 max-w-max px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-                  {item?.status}
-                </span>
-                <div className="col-[1/2] row-[1/2] z-10 p-5 flex flex-col text-white backdrop-blur-[2px] rounded-b-lg">
-                  <span className="max-w-max px-2 py-0.5 rounded text-xs font-bold bg-white text-[#135BEC]">
-                    {item?.code}
-                  </span>
-                  <p className="text-lg font-bold leading-snug mb-1 mt-2">
-                    {item?.title}
-                  </p>
-                  <p className="text-sm line-clamp-2">{item?.description}</p>
-                  <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center gap-2">
-                      <Module className="size-4" />
-                      <span className="text-xs text-[#ffffff]">
-                        {item?._count.modules}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Group className="size-4" />
-                      <span className="text-xs text-[#ffffff]">
-                        {item?._count.instructors}
-                      </span>
-                    </div>
-                    <Link
-                      href={`/admin/courses/${item?.id}`}
-                      className="flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium border ml-auto"
-                    >
-                      <span>Edit Course</span>
-                      <Arrow className="size-5 rotate-180" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+
+      {/* Stat cards */}
+      <section className="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
+        {statCards.map((card) => (
+          <div
+            key={card.title}
+            className="bg-white p-5 rounded-lg border border-slate-100 shadow-sm flex items-center justify-between hover:border-[#135BEC]/30 transition-colors"
+          >
+            <div className="space-y-1">
+              <p className="text-slate-500 text-xs font-semibold uppercase tracking-wider">
+                {card.title}
+              </p>
+              <p className="text-2xl font-bold text-slate-900">{card.value}</p>
+            </div>
+            {card.icon}
+          </div>
+        ))}
       </section>
+
+      {/* Filters */}
+      <Suspense>
+        <CourseFilters counts={counts} />
+      </Suspense>
+
+      {/* Course grid */}
+      {courses.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-24 text-center">
+          <p className="text-base font-semibold text-[#111318]">
+            No courses found
+          </p>
+          <p className="mt-1 text-sm text-[#616f89]">
+            {params.search || params.status
+              ? "Try adjusting your search or filters."
+              : "Create your first course to get started."}
+          </p>
+          {!params.search && !params.status && (
+            <Link
+              href="/admin/courses/new"
+              className="mt-4 flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#135BEC] text-white text-sm font-bold hover:bg-[#135BEC]/90 transition-colors"
+            >
+              <Plus className="size-4" />
+              Create Course
+            </Link>
+          )}
+        </div>
+      ) : (
+        <section className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-6">
+          {courses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </section>
+      )}
+
+      {/* Pagination */}
+      <Suspense>
+        <LearnerFooter total={total} pageSize={pageSize} currentPage={page} />
+      </Suspense>
     </main>
   );
 }

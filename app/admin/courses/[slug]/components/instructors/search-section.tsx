@@ -3,57 +3,57 @@ import Search from "@/assets/icons/search.svg";
 import InstructorsItem from "./instructors-item";
 
 export interface SearchSectionProps {
-  search: string;
+  inputValue: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   searchUsers: Instructor[];
   isSearching: boolean;
-  debouncedSearch: string;
+  hasSearchTerm: boolean;
   assignedInstructorIds: Set<string>;
   onAddInstructor: (instructor: Instructor) => void;
 }
 
 export default function SearchSection({
-  search,
+  inputValue,
   onSearchChange,
   searchUsers,
   isSearching,
-  debouncedSearch,
+  hasSearchTerm,
   assignedInstructorIds,
   onAddInstructor,
 }: SearchSectionProps) {
   return (
     <div className="space-y-3">
-      {/* Search Input */}
-      <div className="h-8 flex items-center pl-2 rounded-lg overflow-hidden outline-0 ring ring-gray-200 focus-within:ring-1 focus-within:ring-blue-500">
-        <Search className="size-5 text-[#617789]" />
+      <div className="h-9 flex items-center pl-3 rounded-lg overflow-hidden ring ring-gray-200 focus-within:ring-1 focus-within:ring-blue-500 bg-white">
+        <Search className="size-4 text-[#617789] shrink-0" />
         <input
           type="text"
-          value={search}
+          value={inputValue}
           onChange={onSearchChange}
-          placeholder="Search to add instructor..."
-          className="w-full h-full px-2 text-sm placeholder:text-[#617789] outline-0 focus:ring-0 text-[#111518]"
+          placeholder="Search to add instructor…"
+          className="w-full h-full px-2 text-sm placeholder:text-[#617789] outline-0 text-[#111518]"
         />
       </div>
 
       {isSearching && (
-        <p className="text-xs text-gray-400 text-center p-2">Searching</p>
+        <p className="text-xs text-gray-400 text-center py-2">Searching…</p>
       )}
 
-      {!searchUsers?.length && debouncedSearch && !isSearching && (
-        <p className="text-xs text-gray-400 text-center p-2">No instructors</p>
+      {/* Empty state — only show when user has typed and results came back empty */}
+      {!isSearching && hasSearchTerm && searchUsers.length === 0 && (
+        <p className="text-xs text-gray-400 text-center py-2">
+          No instructors found
+        </p>
       )}
 
-      {searchUsers?.map((instructor) => {
-        return (
-          <InstructorsItem
-            key={instructor.id}
-            instructor={instructor}
-            action="add"
-            isAssigned={assignedInstructorIds.has(instructor.id)}
-            onClick={() => onAddInstructor(instructor)}
-          />
-        );
-      })}
+      {searchUsers.map((instructor) => (
+        <InstructorsItem
+          key={instructor.id}
+          instructor={instructor}
+          action="add"
+          isAssigned={assignedInstructorIds.has(instructor.id)}
+          onClick={() => onAddInstructor(instructor)}
+        />
+      ))}
     </div>
   );
 }

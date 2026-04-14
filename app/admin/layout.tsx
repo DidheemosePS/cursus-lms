@@ -14,16 +14,7 @@ export default async function LearnerLayout({
     redirect("/login");
   }
   return (
-    <ClientWrapper
-      session={{
-        userId: session.userId,
-        organizationId: session.organizationId,
-        name: session.name,
-        email: session.email,
-        role: session.role,
-        isLoggedIn: session.isLoggedIn,
-      }}
-    >
+    <ClientWrapper session={JSON.parse(JSON.stringify(session))}>
       {children}
     </ClientWrapper>
   );
