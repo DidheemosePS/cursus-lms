@@ -42,10 +42,7 @@ export default function NavBar({
               fill="#c9934a"
             />
           </svg>
-          <span
-            style={{ fontFamily: "'Playfair Display', serif" }}
-            className="text-xl font-bold tracking-tight text-[#111318] leading-none"
-          >
+          <span className="text-xl font-bold tracking-tight text-[#111318] leading-none">
             Cursus
             <span className="text-[#c9934a]">.</span>
           </span>
