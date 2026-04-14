@@ -80,7 +80,6 @@ body {
   --l-slate-mid: #252a38;
   --l-border: rgba(255, 255, 255, 0.08);
 
-  font-family: "DM Sans", sans-serif;
   background: var(--l-ink);
   color: var(--l-ivory);
   overflow-x: hidden;
@@ -109,7 +108,6 @@ body {
 }
 
 .l-nav-logo {
-  font-family: "Playfair Display", serif;
   font-size: 1.25rem;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -235,7 +233,6 @@ body {
 }
 
 .l-hero-title {
-  font-family: "Playfair Display", serif;
   font-size: clamp(3rem, 7vw, 6.5rem);
   font-weight: 900;
   line-height: 1;
@@ -343,7 +340,6 @@ body {
 }
 
 .l-stat-value {
-  font-family: "Playfair Display", serif;
   font-size: 2.25rem;
   font-weight: 700;
   color: var(--l-ivory);
@@ -379,7 +375,6 @@ body {
 }
 
 .l-preview-title {
-  font-family: "Playfair Display", serif;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   color: var(--l-ivory);
@@ -475,7 +470,6 @@ body {
 }
 
 .l-preview-stat-value {
-  font-family: "Playfair Display", serif;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--l-ivory);
@@ -567,7 +561,6 @@ body {
 }
 
 .l-section-title {
-  font-family: "Playfair Display", serif;
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 700;
   color: var(--l-ivory);
@@ -620,7 +613,6 @@ body {
 }
 
 .l-feature-title {
-  font-family: "Playfair Display", serif;
   font-size: 1.2rem;
   font-weight: 700;
   color: var(--l-ivory);
@@ -636,7 +628,7 @@ body {
 
 /* ROLES */
 .l-roles {
-  padding: 6rem 3rem;
+  padding: 6rem 0rem;
   background: var(--l-slate);
   border-top: 1px solid var(--l-border);
   border-bottom: 1px solid var(--l-border);
@@ -678,7 +670,6 @@ body {
 }
 
 .l-role-title {
-  font-family: "Playfair Display", serif;
   font-size: 1.5rem;
   font-weight: 700;
   color: var(--l-ivory);
@@ -725,7 +716,6 @@ body {
 }
 
 .l-testimonial-quote {
-  font-family: "Playfair Display", serif;
   font-size: clamp(1.5rem, 3vw, 2.25rem);
   font-style: italic;
   font-weight: 700;
@@ -769,7 +759,6 @@ body {
 }
 
 .l-cta-title {
-  font-family: "Playfair Display", serif;
   font-size: clamp(2.5rem, 5vw, 4.5rem);
   font-weight: 900;
   color: var(--l-ivory);
@@ -801,7 +790,6 @@ body {
 }
 
 .l-footer-logo {
-  font-family: "Playfair Display", serif;
   font-size: 1rem;
   font-weight: 700;
   color: var(--l-ivory-dim);
