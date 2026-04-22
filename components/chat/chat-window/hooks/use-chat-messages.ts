@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { pusherClient } from "@/lib/pusher.init";
 import { ChatMessageItem } from "@/components/chat/types/chat.types";
+import { getPusherClient } from "@/lib/pusher.init";
 
 export function useChatMessages(initialMessages: ChatMessageItem[]) {
   const searchParams = useSearchParams();
@@ -14,6 +14,8 @@ export function useChatMessages(initialMessages: ChatMessageItem[]) {
 
   useEffect(() => {
     if (!chatId) return;
+
+    const pusherClient = getPusherClient();
 
     const channel = pusherClient.subscribe(`chat-${chatId}`);
 

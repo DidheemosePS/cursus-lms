@@ -75,7 +75,6 @@ export default function AdminLearnerDrawer({
             <AdminLearnerDrawerContent
               learner={data.learner}
               availableCourses={data.availableCourses}
-              onClose={() => setOpen(false)}
             />
           ) : null}
         </div>

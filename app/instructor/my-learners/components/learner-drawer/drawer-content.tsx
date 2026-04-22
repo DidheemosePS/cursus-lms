@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import { useTransition } from "react";
 import { LearnerDetail } from "@/dal/instructors/learners.dal";
@@ -11,7 +10,7 @@ const DEFAULT_AVATAR =
   "https://lms-mvp-test.s3.eu-west-1.amazonaws.com/profileImage/avataaars.png";
 
 interface LearnerDrawerContentProps {
-  learner: NonNullable<LearnerDetail>;
+  learner: LearnerDetail;
   courseId: string;
 }
 
@@ -29,7 +28,7 @@ export default function LearnerDrawerContent({
 
   return (
     <div className="flex flex-col gap-6 p-6">
-      {/* ── Learner profile ── */}
+      {/* Learner profile */}
       <div className="flex items-center gap-4">
         <div className="relative size-16 rounded-full overflow-hidden border border-gray-100 shrink-0">
           <Image
@@ -57,7 +56,7 @@ export default function LearnerDrawerContent({
 
       <div className="h-px bg-[#f0f2f4]" />
 
-      {/* ── Enrolled courses ── */}
+      {/* Enrolled courses */}
       <div className="flex flex-col gap-5">
         <p className="text-sm font-bold text-[#111318] uppercase tracking-wider">
           Courses
@@ -66,17 +65,23 @@ export default function LearnerDrawerContent({
         {learner.enrollments.map((enrollment) => {
           const course = enrollment.course;
           const totalModules = course._count.modules;
-          const progress = Math.min(
-            100,
-            Math.round(enrollment.progressPercent),
-          );
+
+          // progressPercent column dropped — compute from completedModules
+          const progress =
+            totalModules > 0
+              ? Math.min(
+                  100,
+                  Math.round(
+                    (enrollment.completedModules / totalModules) * 100,
+                  ),
+                )
+              : 0;
 
           return (
             <div
               key={course.id}
               className="flex flex-col gap-4 rounded-xl border border-[#f0f2f4] p-4"
             >
-              {/* Course header */}
               <div className="flex items-start justify-between gap-2">
                 <div>
                   <p className="text-sm font-bold text-[#111318]">
@@ -96,7 +101,6 @@ export default function LearnerDrawerContent({
                 </div>
               </div>
 
-              {/* Progress bar */}
               <div className="h-1.5 w-full bg-[#e5e7eb] rounded-full overflow-hidden">
                 <div
                   className="h-full bg-[#135BEC] rounded-full"
@@ -104,7 +108,6 @@ export default function LearnerDrawerContent({
                 />
               </div>
 
-              {/* ── Modules ── */}
               <div className="flex flex-col gap-2">
                 {course.modules.map((module) => {
                   const submission = module.submissions[0] ?? null;
@@ -113,9 +116,6 @@ export default function LearnerDrawerContent({
                   const isLate = submission?.isLate ?? false;
                   const isReviewed = submission?.status === "reviewed";
                   const hasFeedback = !!submission?.feedback;
-                  const { datePart, timePart } = timeStampStyling(
-                    submission.createdAt,
-                  );
 
                   return (
                     <div
@@ -130,7 +130,6 @@ export default function LearnerDrawerContent({
                               : "border-[#f0f2f4] bg-gray-50/50"
                       }`}
                     >
-                      {/* Module row */}
                       <div className="flex items-center justify-between gap-2">
                         <p className="text-xs font-semibold text-[#111318] truncate">
                           Module {module.position} · {module.title}
@@ -155,44 +154,44 @@ export default function LearnerDrawerContent({
                         </div>
                       </div>
 
-                      {/* Submission detail */}
-                      {submission && (
-                        <div className="flex flex-col gap-1.5 pt-1 border-t border-[#f0f2f4]">
-                          <div className="flex items-center justify-between">
-                            <p className="text-xs text-[#617789] truncate max-w-[60%]">
-                              {submission.fileName}
-                            </p>
-                            <span
-                              className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${
-                                isLate
-                                  ? "bg-red-100 text-red-700"
-                                  : "bg-green-100 text-green-700"
-                              }`}
-                            >
-                              {isLate ? "Late" : "On time"}
-                            </span>
-                          </div>
-                          <p className="text-[10px] text-[#617789]">
-                            Submitted {datePart} {timePart}
-                          </p>
-
-                          {/* Feedback */}
-                          {hasFeedback ? (
-                            <div className="mt-1 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
-                              <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1">
-                                Feedback given
+                      {/* Only render submission block when submission exists */}
+                      {submission &&
+                        (() => {
+                          const { datePart, timePart } = timeStampStyling(
+                            submission.createdAt,
+                          );
+                          return (
+                            <div className="flex flex-col gap-1.5 pt-1 border-t border-[#f0f2f4]">
+                              <div className="flex items-center justify-between">
+                                <p className="text-xs text-[#617789] truncate max-w-[60%]">
+                                  {submission.fileName}
+                                </p>
+                                <span
+                                  className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${isLate ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}
+                                >
+                                  {isLate ? "Late" : "On time"}
+                                </span>
+                              </div>
+                              <p className="text-[10px] text-[#617789]">
+                                Submitted {datePart} {timePart}
                               </p>
-                              <p className="text-xs text-[#111318] leading-relaxed line-clamp-3">
-                                {submission.feedback!.content}
-                              </p>
+                              {hasFeedback ? (
+                                <div className="mt-1 rounded-lg bg-blue-50 border border-blue-100 px-3 py-2">
+                                  <p className="text-[10px] font-bold text-blue-700 uppercase tracking-wider mb-1">
+                                    Feedback given
+                                  </p>
+                                  <p className="text-xs text-[#111318] leading-relaxed line-clamp-3">
+                                    {submission.feedback!.content}
+                                  </p>
+                                </div>
+                              ) : isReviewed ? null : (
+                                <button className="mt-1 w-full text-xs font-semibold py-1.5 px-3 rounded-lg border border-[#dbe1e6] text-[#111318] hover:bg-gray-50 transition-colors">
+                                  Review submission
+                                </button>
+                              )}
                             </div>
-                          ) : isReviewed ? null : (
-                            <button className="mt-1 w-full text-xs font-semibold py-1.5 px-3 rounded-lg border border-[#dbe1e6] text-[#111318] hover:bg-gray-50 transition-colors">
-                              Review submission
-                            </button>
-                          )}
-                        </div>
-                      )}
+                          );
+                        })()}
                     </div>
                   );
                 })}

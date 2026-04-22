@@ -3,7 +3,7 @@
 import { sendMessage } from "@/dal/chat/chat.dal";
 import { getSession } from "@/lib/auth/auth";
 import prisma from "@/lib/prisma.init";
-import { pusher } from "@/lib/pusher.init";
+import { getPusher } from "@/lib/pusher.init";
 import { redirect } from "next/navigation";
 
 export async function markAsRead(conversationId: string) {
@@ -26,6 +26,8 @@ export async function handleChatInput(chatId: string, formData: FormData) {
   const sendMessageRes = await sendMessage(chatId, content);
 
   if (!sendMessageRes) return;
+
+  const pusher = getPusher();
 
   pusher.trigger(`chat-${chatId}`, "new-message", sendMessageRes.newMessage);
 

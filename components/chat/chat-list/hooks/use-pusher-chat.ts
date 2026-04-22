@@ -1,7 +1,7 @@
 import { useEffect } from "react";
-import { pusherClient } from "@/lib/pusher.init";
 import { markAsRead } from "@/actions/chat.actions";
 import { ConversationItem } from "@/components/chat/types/chat.types";
+import { getPusherClient } from "@/lib/pusher.init";
 
 export function usePusherChat(
   userId: string,
@@ -10,6 +10,8 @@ export function usePusherChat(
 ) {
   useEffect(() => {
     if (!userId) return;
+
+    const pusherClient = getPusherClient();
 
     const channel = pusherClient.subscribe(`user-${userId}`);
 

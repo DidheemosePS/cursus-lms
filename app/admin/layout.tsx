@@ -6,7 +6,6 @@ export default async function LearnerLayout({
   children,
 }: {
   children: React.ReactNode;
-  model: React.ReactNode;
 }) {
   // Auth Check
   const session: SessionData = await getSession();

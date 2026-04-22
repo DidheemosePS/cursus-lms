@@ -1,0 +1,49 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      # Log in to ECR so Docker can push images
+      # aws ecr get-login-password pipes the token directly to docker login
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $ECR_REPOSITORY_URL
+
+      # Use the first 7 characters of the Git commit SHA as the image tag
+      # CODEBUILD_RESOLVED_SOURCE_VERSION is set automatically by CodeBuild
+      - IMAGE_TAG=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c1-7)
+
+      # Full image URI with commit SHA tag
+      - IMAGE_URI=$ECR_REPOSITORY_URL:$IMAGE_TAG
+
+      - echo Build started on $(date)
+      - echo Building image $IMAGE_URI
+
+  build:
+    commands:
+      - echo Building the Docker image...
+      - docker build -t $IMAGE_URI .
+
+      # Also tag as latest so you can always pull the most recent image easily
+      - docker tag $IMAGE_URI $ECR_REPOSITORY_URL:latest
+
+  post_build:
+    commands:
+      - echo Pushing the Docker image to ECR...
+      - docker push $IMAGE_URI
+      - docker push $ECR_REPOSITORY_URL:latest
+
+      - echo Build completed on $(date)
+
+      # Generate imagedefinitions.json — this is what CodePipeline reads
+      # to know which container and image to deploy to ECS
+      # CONTAINER_NAME must match the container name in the ECS task definition
+      - echo Writing imagedefinitions.json...
+      - printf '[{"name":"%s","imageUri":"%s"}]' $CONTAINER_NAME $IMAGE_URI > imagedefinitions.json
+
+      # Print it so you can see it in the build logs
+      - cat imagedefinitions.json
+
+# Tell CodePipeline where to find imagedefinitions.json
+artifacts:
+  files:
+    - imagedefinitions.json

@@ -95,7 +95,7 @@ export default function AdminLearnerDrawerContent({
             Invite not accepted yet
           </p>
           <p className="text-xs text-amber-600 leading-relaxed">
-            This learner hasn't accepted their invite. They won't be able to
+            This learner hasn&apos;t accepted their invite. They won&apos;t be able to
             access course content until they do. You can still enroll them —
             access activates when they join.
           </p>

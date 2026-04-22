@@ -1,5 +1,4 @@
 "use server";
-
 import prisma from "@/lib/prisma.init";
 import { getSession } from "@/lib/auth/auth";
 import { redirect } from "next/navigation";
@@ -90,7 +89,6 @@ export async function getLearners({
     const modules = e.course.modules;
     const totalModules = e.course._count.modules;
 
-    // Late = past due with no submission OR submitted with isLate flag
     const lateCount = modules.filter((m) => {
       const isPastDue = new Date(m.dueDate) < now;
       const submission = m.submissions.find((s) => s.learnerId === e.learnerId);
@@ -98,7 +96,6 @@ export async function getLearners({
       return submission.isLate;
     }).length;
 
-    // Pending = due date still in the future, not yet submitted
     const pendingCount = modules.filter((m) => {
       const isDueInFuture = new Date(m.dueDate) >= now;
       const hasSubmission = m.submissions.some(
@@ -135,8 +132,6 @@ export async function getLearners({
   return { learners: paginated, total, courses, pageSize: PAGE_SIZE };
 }
 
-// Drawer detail
-
 export async function getLearnerDetail(learnerId: string) {
   const { userId } = await getSession();
   if (!userId) redirect("/login");
@@ -162,7 +157,6 @@ export async function getLearnerDetail(learnerId: string) {
         },
         select: {
           completedModules: true,
-          progressPercent: true,
           course: {
             select: {
               id: true,
@@ -214,4 +208,7 @@ export type CourseOption = Awaited<
   ReturnType<typeof getLearners>
 >["courses"][number];
 
-export type LearnerDetail = Awaited<ReturnType<typeof getLearnerDetail>>;
+// Correctly typed as the shaped select result — not the full Prisma User type
+export type LearnerDetail = NonNullable<
+  Awaited<ReturnType<typeof getLearnerDetail>>
+>;
