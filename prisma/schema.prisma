@@ -1,0 +1,285 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  admin
+  instructor
+  learner
+}
+
+enum UserStatus {
+  pending_invite
+  active
+  inactive
+}
+
+enum CourseStatus {
+  draft
+  active
+  archived
+}
+
+enum EnrollmentStatus {
+  enrolled
+  unenrolled
+}
+
+enum SubmissionStatus {
+  submitted
+  reviewed
+}
+
+enum ConversationType {
+  DIRECT
+  GROUP
+}
+
+enum NotificationType {
+  new_submission
+  feedback_given
+  new_message
+  enrollment_invite
+}
+
+model Organization {
+  id        String   @id @default(uuid(7))
+  name      String
+  slug      String   @unique
+  users     User[]
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model User {
+  id             String       @id @default(uuid(7))
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  name         String
+  email        String     @unique
+  passwordHash String
+  salt         String
+  role         UserRole
+  status       UserStatus @default(pending_invite)
+  avatar       String @default("https://testingbot.com/free-online-tools/random-avatar/100?img=4")
+
+  enrollments Enrollment[]
+  instructedCourses CourseInstructor[]
+  submissions Submission[]
+  messages    Message[]
+  notifications Notification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversationMembers ConversationMember[]
+  feedbacks        Feedback[]
+  recentActivities RecentActivities[]
+}
+
+model Course {
+  id             String       @id @default(uuid(7))
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+
+  title       String
+  description String
+  code        String
+  coverImageUrl String
+  status      CourseStatus @default(draft)
+
+  modules       Module[]
+  instructors   CourseInstructor[]
+  enrollments   Enrollment[]
+  conversations Conversation[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Module {
+  id       String @id @default(uuid(7))
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id])
+
+  title       String
+  description String
+  position    Int
+  startDate   DateTime
+  dueDate     DateTime
+
+  submissions Submission[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CourseInstructor {
+  id            String @id @default(uuid(7))
+  courseId      String
+  instructorId  String
+
+  course      Course @relation(fields: [courseId], references: [id])
+  instructor  User   @relation(fields: [instructorId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([courseId, instructorId])
+}
+
+enum ProgressStatus {
+  in_progress
+  not_started
+  completed
+}
+
+model Enrollment {
+  id        String @id @default(uuid(7))
+  courseId  String
+  learnerId String
+
+  course  Course @relation(fields: [courseId], references: [id])
+  learner User   @relation(fields: [learnerId], references: [id])
+
+  enrollmentStatus       EnrollmentStatus
+  progressStatus ProgressStatus @default(not_started)
+  completedModules Int @default(0)
+  lastProgressAt DateTime?
+
+
+  enrolledAt   DateTime?
+  inviteSentAt DateTime?
+
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([courseId, learnerId])
+}
+
+model Submission {
+  id        String @id @default(uuid(7))
+  moduleId  String
+  learnerId String
+
+  module  Module @relation(fields: [moduleId], references: [id])
+  learner User   @relation(fields: [learnerId], references: [id])
+
+  attemptNumber Int
+  fileUrl       String
+  fileName      String
+  fileSize      Int
+
+  isLate      Boolean
+  status      SubmissionStatus @default(submitted)
+
+  feedback Feedback?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([moduleId, learnerId, attemptNumber])
+}
+
+model Feedback {
+  id            String @id @default(uuid(7))
+  submissionId  String @unique
+  instructorId  String
+
+  submission Submission @relation(fields: [submissionId], references: [id])
+  instructor User       @relation(fields: [instructorId], references: [id])
+
+  content String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Conversation {
+  id       String           @id @default(uuid(7))
+  type     ConversationType
+  
+  courseId String
+  course   Course               @relation(fields: [courseId], references: [id])
+
+  lastMessageId String? @unique
+  lastMessageAt DateTime @default(now())
+
+  members  ConversationMember[]
+  messages Message[]
+
+  latestMessage Message?  @relation("LatestMessage", fields: [lastMessageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([lastMessageAt(sort: Desc)])
+}
+
+model ConversationMember {
+  id             String @id @default(uuid(7))
+  conversationId String
+  userId         String
+
+  unreadCount Int @default(0)
+  lastReadAt     DateTime @default(now())
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
+}
+
+model Message {
+  id             String @id @default(uuid(7))
+  conversationId String
+  senderId       String
+  content String
+
+  conversation Conversation @relation(fields: [conversationId], references: [id])
+  sender       User         @relation(fields: [senderId], references: [id])
+
+  lastMessageFor  Conversation? @relation("LatestMessage")
+
+  createdAt DateTime @default(now())
+}
+
+model Notification {
+  id          String           @id @default(uuid(7))
+  userId      String
+  type        NotificationType
+  referenceId String
+  isRead      Boolean          @default(false)
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+enum Action {
+  created
+  updated
+  delete
+  modified
+  assigned
+}
+
+model RecentActivities {
+  id             String @id @default(uuid(7))
+  userId         String
+  organizationId String
+  action         Action
+  target         String
+
+  user User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+}

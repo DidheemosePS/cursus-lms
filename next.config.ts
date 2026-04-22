@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // Required for Docker — bundles all dependencies into .next/standalone
+  output: "standalone",
+
   turbopack: {
     rules: {
       "*.svg": {
@@ -15,24 +17,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "epearlacademy.com",
-        port: "",
+        hostname: "lms-mvp-test.s3.eu-west-1.amazonaws.com",
         pathname: "**",
-        search: "",
-      },
-      {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
-        port: "",
-        pathname: "**",
-        search: "",
-      },
-      {
-        protocol: "https",
-        hostname: "avatar.iran.liara.run",
-        port: "",
-        pathname: "**",
-        search: "",
       },
       {
         protocol: "https",
@@ -40,11 +26,6 @@ const nextConfig: NextConfig = {
         port: "",
         pathname: "**",
         search: "",
-      },
-      {
-        protocol: "https",
-        hostname: "testingbot.com",
-        pathname: "**",
       },
     ],
   },
