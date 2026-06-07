@@ -1,74 +1,57 @@
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
+FROM node:20-alpine AS base
 
+# Install pnpm globally
+RUN npm i -g pnpm
+
+# Set working directory
 WORKDIR /app
 
-RUN apk add --no-cache openssl libc6-compat
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
+#Copy package.json and pnpm-lock.yaml to install dependencies first
 COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
 
+#Install dependencies
+RUN pnpm install
 
-# Stage 2: Builder
-FROM node:20-alpine AS builder
+FROM base AS builder
 
-WORKDIR /app
+# Pass the Pusher key from build-time arguments to environment variables 
+# so it is accessible to Next.js during the client-side build process.
+ARG NEXT_PUBLIC_PUSHER_KEY
+ENV NEXT_PUBLIC_PUSHER_KEY=$NEXT_PUBLIC_PUSHER_KEY
 
-RUN apk add --no-cache openssl libc6-compat
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
-COPY --from=deps /app/node_modules ./node_modules
+# Copy the rest of the application files
 COPY . .
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+# Build the application
+RUN pnpm run build
 
-# Generate Prisma client here — after full source copy so schema.prisma is present
-# pnpm with hoisting puts the output in node_modules/.prisma reliably at this stage
-RUN pnpm exec prisma generate
-
-# Build Next.js
-RUN pnpm build
-
-
-# Stage 3: Runner
 FROM node:20-alpine AS runner
 
+# Install pnpm in the runner stage
+RUN npm i -g pnpm
+
+# Set the working directory
 WORKDIR /app
 
-RUN apk add --no-cache openssl libc6-compat
+# Copy the necessary files from the builder stage for the standalone build
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static .next/static
+
+# Change ownership of the files to the node user
+RUN chown -R node:node /app
+
+# Switch to the non-root user
+USER node
+
+# Add healthcheck for container monitoring
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
-
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Standalone server
-COPY --from=builder /app/.next/standalone ./
-
-# Static assets
-COPY --from=builder /app/.next/static ./.next/static
-
-# Public folder
-COPY --from=builder /app/public ./public
-
-# Prisma schema — needed at runtime for migrations and query engine
-COPY --from=builder /app/prisma ./prisma
-
-# Copy entire node_modules from builder for Prisma runtime engine
-# standalone output includes server deps but not Prisma engine binaries
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma/client ./node_modules/@prisma/client
-
-RUN chown -R nextjs:nodejs /app
-
-USER nextjs
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
 
 EXPOSE 3000
 
-ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
-CMD ["node", "server.js"]
+CMD [ "node", "server.js" ]

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRef, useState, useTransition, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Arrow from "@/assets/icons/down-arrow.svg";
+import { getApiUrl } from "@/utils/api";
 
 const ALLOWED_IMAGE_TYPES = ["image/png", "image/jpeg", "image/webp"];
 
@@ -50,14 +51,11 @@ export default function Page() {
     if (coverImage) formData.set("coverImage", coverImage);
 
     startTransition(async () => {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/courses`,
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        },
-      );
+      const res = await fetch(getApiUrl(`/api/admin/courses`), {
+        method: "POST",
+        credentials: "include",
+        body: formData,
+      });
 
       const data = await res.json();
 

@@ -7,6 +7,7 @@ import CoverImageSection from "./cover-image-section";
 import InputField from "./input-field";
 import TextAreaField from "./text-area-field";
 import { useParams } from "next/navigation";
+import { getApiUrl } from "@/utils/api";
 
 interface Course {
   id: string;
@@ -174,14 +175,11 @@ export default function CourseInfo({ course }: { course: Course }) {
       }
 
       // Calling API to save changes
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/admin/courses/${slug}`,
-        {
-          method: "PATCH",
-          credentials: "include",
-          body: formData,
-        },
-      );
+      const response = await fetch(getApiUrl(`/api/admin/courses/${slug}`), {
+        method: "PATCH",
+        credentials: "include",
+        body: formData,
+      });
 
       // API error handling
       if (!response.ok) {

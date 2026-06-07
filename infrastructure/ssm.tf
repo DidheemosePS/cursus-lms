@@ -76,7 +76,7 @@ resource "aws_ssm_parameter" "aws_bucket_name" {
 }
 
 resource "aws_ssm_parameter" "app_url" {
-  name  = "/${var.app_name}/${var.environment}/NEXT_PUBLIC_APP_URL"
+  name  = "/${var.app_name}/${var.environment}/APP_URL"
   type  = "String"
   value = "https://${var.domain_name}"
 

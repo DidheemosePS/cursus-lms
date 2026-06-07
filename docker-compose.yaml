@@ -1,0 +1,43 @@
+# The name of the project
+name: cursus
+
+services:
+  # Database Service
+  db:
+    # Uses the official PostgreSQL image from Docker Hub
+    image: postgres
+    # Maps port 5432 on the host machine to port 5432 inside the container
+    ports:
+      - "5432:5432"
+    # Environment variables required to initialize the Postgres database
+    # Note: Fill these in or map them to variables for security
+    environment:
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
+      - POSTGRES_DB=
+    # Persists database data by linking a named volume to the container's internal storage
+    volumes:
+      - db-data:/var/lib/postgresql
+
+  # Web Application Service
+  web:
+    # Builds the image using the local Dockerfile
+    build:
+      context: .
+      # Passes host environment variables as build-time arguments to the Dockerfile
+      args:
+        - NEXT_PUBLIC_PUSHER_KEY=${NEXT_PUBLIC_PUSHER_KEY}
+    # Ensures the 'db' container starts up before the 'web' container starts
+    depends_on:
+      - db
+    # Maps port 3000 on the host machine to port 3000 inside the container
+    ports:
+      - "3000:3000"
+    # Loads runtime environment variables from a local '.env' file into the container
+    env_file:
+      - .env.example
+
+# Definition of named volumes to persist data independently of container lifecycles
+volumes:
+  db-data:
+    driver: local # Uses the standard local storage driver on the host system

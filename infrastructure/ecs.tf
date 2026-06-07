@@ -116,7 +116,7 @@ resource "aws_ecs_task_definition" "app" {
           value = var.aws_region
         },
         {
-          name  = "NEXT_PUBLIC_APP_URL"
+          name  = "APP_URL"
           value = "https://${var.domain_name}"
         }
       ]

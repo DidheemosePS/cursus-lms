@@ -2,10 +2,10 @@ import { S3Client } from "@aws-sdk/client-s3";
 
 // S3 Credentials
 export const S3_CONFIG = {
-  REGION: process.env.NEXT_AWS_S3_REGION || "eu-west-1",
-  BUCKET: process.env.NEXT_AWS_S3_BUCKET_NAME || "",
-  ACCESS_KEY_ID: process.env.NEXT_AWS_S3_ACCESS_KEY_ID || "",
-  SECRET_ACCESS_KEY: process.env.NEXT_AWS_S3_SECRET_ACCESS_KEY || "",
+  REGION: process.env.AWS_S3_REGION || "eu-west-1",
+  BUCKET: process.env.AWS_S3_BUCKET_NAME || "",
+  ACCESS_KEY_ID: process.env.AWS_S3_ACCESS_KEY_ID || "",
+  SECRET_ACCESS_KEY: process.env.AWS_S3_SECRET_ACCESS_KEY || "",
 } as const;
 
 // Upload Config
