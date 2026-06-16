@@ -22,6 +22,9 @@ ENV NEXT_PUBLIC_PUSHER_KEY=$NEXT_PUBLIC_PUSHER_KEY
 # Copy the rest of the application files
 COPY . .
 
+# Generate Prisma client with Alpine-compatible binary
+RUN pnpm prisma generate
+
 # Build the application
 RUN pnpm run build
 
@@ -36,6 +39,7 @@ WORKDIR /app
 # Copy the necessary files from the builder stage for the standalone build
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static .next/static
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Change ownership of the files to the node user
 RUN chown -R node:node /app

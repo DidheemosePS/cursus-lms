@@ -21,7 +21,7 @@ phases:
   build:
     commands:
       - echo Building the Docker image...
-      - docker build -t $IMAGE_URI .
+      - docker build --build-arg NEXT_PUBLIC_PUSHER_KEY=$NEXT_PUBLIC_PUSHER_KEY -t $IMAGE_URI .
 
       # Also tag as latest so you can always pull the most recent image easily
       - docker tag $IMAGE_URI $ECR_REPOSITORY_URL:latest
