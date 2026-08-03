@@ -1,56 +1,48 @@
-# Application Load Balancer
-# Sits in public subnets — the only resource directly reachable from the internet
-# Forwards traffic to ECS tasks in private subnets
-
-resource "aws_lb" "main" {
-  name               = "${var.app_name}-alb"
-  internal           = false                          # Public-facing
+resource "aws_lb" "cursus_lb" {
+  name               = "${var.app_name}-lb"
+  internal           = false
   load_balancer_type = "application"
-  security_groups    = [aws_security_group.alb.id]
-  subnets            = aws_subnet.public[*].id        # Both public subnets
+  security_groups    = [aws_security_group.cursus_alb_sg.id]
+  subnets            = [for subnet in aws_subnet.cursus_public : subnet.id]
 
-  # Access logs disabled for minimal setup — enable for production debugging
-  enable_deletion_protection = false
+  enable_deletion_protection = local.enable_deletion_protection
+
+  access_logs {
+    bucket  = aws_s3_bucket.cursus_bucket.id
+    prefix  = "${var.app_name}-lb-logs"
+    enabled = true
+  }
 
   tags = {
-    Name = "${var.app_name}-alb"
+    Environment = "production"
   }
 }
 
-# Target Group
-# The group of ECS tasks the ALB forwards traffic to
-# Health checks ensure only healthy tasks receive traffic
-
-resource "aws_lb_target_group" "app" {
-  name        = "${var.app_name}-tg"
-  port        = var.container_port    # 3000
-  protocol    = "HTTP"                # ALB to ECS is HTTP — SSL terminates at ALB
-  vpc_id      = aws_vpc.main.id
-  target_type = "ip"                  # Required for Fargate — uses task IP not EC2 instance
+resource "aws_lb_target_group" "cursus_lb_tg" {
+  name        = "${var.app_name}-lb-tg"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.cursus_vpc.id
+  target_type = "ip"
 
   health_check {
     enabled             = true
-    path                = "/"          # Next.js landing page
-    port                = "traffic-port"
+    path                = "/api/health"
     protocol            = "HTTP"
-    healthy_threshold   = 2            # 2 consecutive successes = healthy
-    unhealthy_threshold = 3            # 3 consecutive failures = unhealthy
-    timeout             = 5            # Seconds to wait for response
-    interval            = 30           # Seconds between health checks
-    matcher             = "200-399"    # Any 2xx or 3xx = healthy
+    matcher             = "200"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 3
   }
 
   tags = {
-    Name = "${var.app_name}-tg"
+    Name = "${var.app_name}-lb-traget-group"
   }
 }
 
-# HTTP Listener — redirect to HTTPS
-# Any request on port 80 gets a permanent redirect to HTTPS
-# Users who type http:// get automatically upgraded
-
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.main.arn
+  load_balancer_arn = aws_lb.cursus_lb.arn
   port              = 80
   protocol          = "HTTP"
 
@@ -60,24 +52,20 @@ resource "aws_lb_listener" "http" {
     redirect {
       port        = "443"
       protocol    = "HTTPS"
-      status_code = "HTTP_301"    # Permanent redirect
+      status_code = "HTTP_301"
     }
   }
 }
 
-# HTTPS Listener — forward to ECS
-# Accepts HTTPS traffic, terminates SSL, forwards plain HTTP to ECS tasks
-# SSL certificate comes from ACM — created in acm.tf
-
 resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.main.arn
+  load_balancer_arn = aws_lb.cursus_lb.arn
   port              = 443
   protocol          = "HTTPS"
-  ssl_policy        = "ELBSecurityPolicy-TLS13-1-2-2021-06"  # Modern TLS policy
-  certificate_arn   = aws_acm_certificate_validation.main.certificate_arn
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate_validation.cert_validation.certificate_arn
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.app.arn
+    target_group_arn = aws_lb_target_group.cursus_lb_tg.arn
   }
 }

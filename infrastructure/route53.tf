@@ -1,31 +1,36 @@
-# Route 53
-# The hosted zone is created manually in the AWS console — not managed here
-# Reason: you need the nameservers from Route 53 before you can update Namecheap
-# Once Namecheap points to Route 53, Terraform manages all records inside the zone
+resource "aws_route53_zone" "primary" {
+  name = var.domain_name
 
-# Data source — existing hosted zone
-# Reads the hosted zone you created manually
-# This is how Terraform references existing AWS resources it didn't create
-
-data "aws_route53_zone" "main" {
-  zone_id = var.route53_zone_id
+  tags = {
+    Name = "${var.domain_name}-hosted-zone"
+  }
 }
 
-# A Record — domain → ALB
-# Maps your domain to the ALB
-# Alias record is used instead of a regular A record because:
-# - ALB IPs can change — Alias always resolves to the current IPs
-# - Alias records are free — regular A records cost per query
-# - AWS automatically handles health checking of the ALB
+resource "aws_route53_record" "route53_record" {
+  for_each = {
+    for dvo in aws_acm_certificate.cert.domain_validation_options : dvo.domain_name => {
+      name   = dvo.resource_record_name
+      record = dvo.resource_record_value
+      type   = dvo.resource_record_type
+    }
+  }
 
-resource "aws_route53_record" "app" {
-  zone_id = data.aws_route53_zone.main.zone_id
-  name    = var.domain_name     # e.g. cursus.yourdomain.com
+  allow_overwrite = true
+  name            = each.value.name
+  records         = [each.value.record]
+  ttl             = 60
+  type            = each.value.type
+  zone_id         = aws_route53_zone.primary.zone_id
+}
+
+resource "aws_route53_record" "alb_alias" {
+  zone_id = aws_route53_zone.primary.zone_id
+  name    = var.domain_name
   type    = "A"
 
   alias {
-    name                   = aws_lb.main.dns_name        # ALB DNS name
-    zone_id                = aws_lb.main.zone_id         # ALB hosted zone ID — not your zone
-    evaluate_target_health = true                        # Route 53 checks ALB health
+    name                   = aws_lb.cursus_lb.dns_name
+    zone_id                = aws_lb.cursus_lb.zone_id
+    evaluate_target_health = true
   }
 }

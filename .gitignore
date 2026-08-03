@@ -39,16 +39,20 @@ yarn-error.log*
 # vercel
 .vercel
 
+# VS Code
+.vscode
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
 # Prisma
 /generated/prisma
+prisma/seed.ts
 
 # Terraform
 .terraform/
 *.tfstate
-*.tfstate.backup
+*.tfstate.*
+.terraform.tfstate.lock.info
 .terraform.lock.hcl
-terraform.tfvars

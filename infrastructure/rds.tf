@@ -1,82 +1,56 @@
-# DB Subnet Group
-# Tells RDS which subnets it can use
-# Must span at least two AZs — AWS requirement even for single instance
+resource "aws_db_subnet_group" "cursus_db_subnet_group" {
 
-resource "aws_db_subnet_group" "main" {
-  name        = "${var.app_name}-db-subnet-group"
-  description = "Subnet group for Cursus RDS instance"
-  subnet_ids  = aws_subnet.private[*].id    # Both private subnets
+  name       = "${var.app_name}-db-subnet-group"
+  subnet_ids = [for subnet in aws_subnet.cursus_private : subnet.id]
 
   tags = {
     Name = "${var.app_name}-db-subnet-group"
   }
 }
 
-# DB Parameter Group
-# PostgreSQL configuration settings
-# Defining our own means we can tune settings later without recreating the instance
+resource "aws_db_parameter_group" "cursus_db_parameter_group" {
+  name   = "${var.app_name}-db-parameter-group"
+  family = "postgres18"
 
-resource "aws_db_parameter_group" "main" {
-  name        = "${var.app_name}-db-params"
-  family      = "postgres16"
-  description = "Parameter group for Cursus PostgreSQL 16"
-
-  tags = {
-    Name = "${var.app_name}-db-params"
+  parameter {
+    name  = "log_connections"
+    value = "all"
   }
 }
 
-# RDS Instance
+resource "aws_db_instance" "cursus_db_instance" {
+  identifier                  = "${var.app_name}-db-instance"
+  instance_class              = "db.t3.micro"
+  allocated_storage           = 5
+  engine                      = "postgres"
+  engine_version              = "18.4"
+  username                    = var.db_username
+  manage_master_user_password = true
+  db_subnet_group_name        = aws_db_subnet_group.cursus_db_subnet_group.name
+  vpc_security_group_ids      = [aws_security_group.cursus_db_sg.id]
+  parameter_group_name        = aws_db_parameter_group.cursus_db_parameter_group.name
+  publicly_accessible         = false
+  skip_final_snapshot         = true
+}
 
-resource "aws_db_instance" "main" {
-  identifier = "${var.app_name}-db"
+resource "aws_db_proxy" "cursus_db_proxy" {
+  name                   = "${var.app_name}-db-proxy"
+  debug_logging          = false
+  engine_family          = "POSTGRESQL"
+  idle_client_timeout    = 1800
+  require_tls            = true
+  role_arn               = aws_iam_role.rds_proxy_role.arn
+  vpc_security_group_ids = [aws_security_group.cursus_proxy_sg.id]
+  vpc_subnet_ids         = [for s in aws_subnet.cursus_private : s.id]
 
-  # Engine
-  engine         = "postgres"
-  engine_version = "16"
-  instance_class = var.db_instance_class    # db.t3.micro
-
-  # Storage — gp2 is the standard SSD storage type
-  allocated_storage     = var.db_allocated_storage    # 20GB
-  storage_type          = "gp2"
-  storage_encrypted     = true                        # Encrypt data at rest
-
-  # Database credentials
-  db_name  = var.db_name        # cursus
-  username = var.db_username    # cursus_admin
-  password = var.db_password    # from terraform.tfvars — sensitive
-
-  # Networking — place in private subnets, attach RDS security group
-  db_subnet_group_name   = aws_db_subnet_group.main.name
-  vpc_security_group_ids = [aws_security_group.rds.id]
-
-  # Not publicly accessible — only reachable from within the VPC
-  publicly_accessible = false
-
-  # Configuration
-  parameter_group_name = aws_db_parameter_group.main.name
-  port                 = 5432
-
-  # Backups — 7 days retention, taken during low-traffic window
-  backup_retention_period = 7
-  backup_window           = "03:00-04:00"    # UTC — 3-4am
-  maintenance_window      = "Mon:04:00-Mon:05:00"
-
-  # Protect against accidental deletion
-  deletion_protection = true
-
-  # Take a final snapshot before destroying — protects against data loss
-  # Set to true only if you are sure you want to destroy all data
-  skip_final_snapshot       = false
-  final_snapshot_identifier = "${var.app_name}-db-final-snapshot"
-
-  # Performance Insights — free tier, useful for query monitoring
-  performance_insights_enabled = true
-
-  # Minor version upgrades applied automatically during maintenance window
-  auto_minor_version_upgrade = true
+  auth {
+    auth_scheme = "SECRETS"
+    description = "Master DB credentials from Secrets Manager"
+    iam_auth    = "DISABLED"
+    secret_arn  = aws_db_instance.cursus_db_instance.master_user_secret[0].secret_arn
+  }
 
   tags = {
-    Name = "${var.app_name}-db"
+    Name = "${var.app_name}-db-proxy"
   }
 }

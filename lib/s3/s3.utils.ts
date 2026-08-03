@@ -4,8 +4,6 @@ import { S3Client } from "@aws-sdk/client-s3";
 export const S3_CONFIG = {
   REGION: process.env.AWS_S3_REGION || "eu-west-1",
   BUCKET: process.env.AWS_S3_BUCKET_NAME || "",
-  ACCESS_KEY_ID: process.env.AWS_S3_ACCESS_KEY_ID || "",
-  SECRET_ACCESS_KEY: process.env.AWS_S3_SECRET_ACCESS_KEY || "",
 } as const;
 
 // Upload Config
@@ -47,10 +45,6 @@ export type S3UploadResult = S3UploadResponse | S3UploadError;
 // Create S3 client
 export const s3Client = new S3Client({
   region: S3_CONFIG.REGION,
-  credentials: {
-    accessKeyId: S3_CONFIG.ACCESS_KEY_ID,
-    secretAccessKey: S3_CONFIG.SECRET_ACCESS_KEY,
-  },
 });
 
 export function validateFile(file: File): {

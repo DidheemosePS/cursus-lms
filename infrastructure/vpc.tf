@@ -1,133 +1,138 @@
-# VPC
+provider "aws" {
+  region = var.aws_region
+}
 
-resource "aws_vpc" "main" {
-  cidr_block           = var.vpc_cidr        # 10.0.0.0/16 — 65,536 IP addresses
-  enable_dns_support   = true                # Required for RDS and ECS service discovery
-  enable_dns_hostnames = true                # Required for RDS endpoint resolution
+resource "aws_vpc" "cursus_vpc" {
+  cidr_block           = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
 
   tags = {
-    Name = "${var.app_name}-vpc"
+    Name = "${var.app_name}_vpc"
   }
 }
 
-# Internet Gateway
-# The door between the VPC and the public internet
-# Without this, nothing in the VPC can reach or be reached from the internet
-
-resource "aws_internet_gateway" "main" {
-  vpc_id = aws_vpc.main.id
+resource "aws_vpc_endpoint" "s3" {
+  vpc_id            = aws_vpc.cursus_vpc.id
+  service_name      = "com.amazonaws.${var.aws_region}.s3"
+  vpc_endpoint_type = "Gateway"
+  route_table_ids   = [for rt in aws_route_table.cursus_private_rt : rt.id]
 
   tags = {
-    Name = "${var.app_name}-igw"
+    Name = "${var.app_name}-s3-endpoint"
   }
 }
 
-# Public Subnets
-# The ALB lives here — it needs to be reachable from the internet
-# count = 2 creates one subnet per availability zone
-
-resource "aws_subnet" "public" {
-  count             = length(var.public_subnet_cidrs)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.public_subnet_cidrs[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  # Instances launched in public subnets get a public IP automatically
-  map_public_ip_on_launch = true
+resource "aws_vpc_endpoint" "secretsmanager" {
+  vpc_id              = aws_vpc.cursus_vpc.id
+  service_name        = "com.amazonaws.${var.aws_region}.secretsmanager"
+  vpc_endpoint_type   = "Interface"
+  subnet_ids          = [for s in aws_subnet.cursus_private : s.id]
+  security_group_ids  = [aws_security_group.cursus_vpce_sg.id]
+  private_dns_enabled = true
 
   tags = {
-    Name = "${var.app_name}-public-subnet-${count.index + 1}"
+    Name = "${var.app_name}-secretsmanager-endpoint"
   }
 }
 
-# Private Subnets
-# ECS tasks and RDS live here — never directly reachable from the internet
-
-resource "aws_subnet" "private" {
-  count             = length(var.private_subnet_cidrs)
-  vpc_id            = aws_vpc.main.id
-  cidr_block        = var.private_subnet_cidrs[count.index]
-  availability_zone = var.availability_zones[count.index]
-
-  # No public IPs — private subnet resources are not directly reachable
-  map_public_ip_on_launch = false
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}-private-subnet-${count.index + 1}"
+    Name = "${var.app_name}_igw"
   }
 }
 
-# Elastic IP for NAT Gateway
-# NAT Gateway needs a fixed public IP address
+resource "aws_subnet" "cursus_public" {
+  for_each = var.cursus_public_subnets
 
-resource "aws_eip" "nat" {
+  vpc_id            = aws_vpc.cursus_vpc.id
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.availability_zone
+
+  tags = {
+    Name = "${var.app_name}_public_${each.key}"
+  }
+}
+
+resource "aws_subnet" "cursus_private" {
+  for_each = var.cursus_private_subnets
+
+  vpc_id            = aws_vpc.cursus_vpc.id
+  cidr_block        = each.value.cidr_block
+  availability_zone = each.value.availability_zone
+
+  tags = {
+    Name = "${var.app_name}_private_${each.key}"
+  }
+}
+
+resource "aws_route_table" "cursus_public_rt" {
+  vpc_id = aws_vpc.cursus_vpc.id
+
+  tags = {
+    Name = "${var.app_name}_public_rt"
+  }
+}
+
+resource "aws_route" "cursus_public_r" {
+  route_table_id         = aws_route_table.cursus_public_rt.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+}
+
+resource "aws_route_table_association" "cursus_public_rta" {
+  for_each = var.cursus_public_subnets
+
+  subnet_id      = aws_subnet.cursus_public[each.key].id
+  route_table_id = aws_route_table.cursus_public_rt.id
+}
+
+resource "aws_route_table" "cursus_private_rt" {
+  for_each = var.cursus_private_subnets
+
+  vpc_id = aws_vpc.cursus_vpc.id
+
+  tags = {
+    Name = "${var.app_name}_private_rt"
+  }
+}
+
+resource "aws_route" "cursus_private_r" {
+  for_each = var.cursus_private_subnets
+
+  route_table_id         = aws_route_table.cursus_private_rt[each.key].id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.cursus_nat_gw[each.key].id
+}
+
+resource "aws_route_table_association" "cursus_private_rta" {
+  for_each = var.cursus_private_subnets
+
+  subnet_id      = aws_subnet.cursus_private[each.key].id
+  route_table_id = aws_route_table.cursus_private_rt[each.key].id
+}
+
+resource "aws_eip" "cursus_nat_eip" {
+  for_each = var.cursus_public_subnets
+
   domain = "vpc"
 
   tags = {
-    Name = "${var.app_name}-nat-eip"
+    Name = "${var.app_name}_nat_eip_${each.key}"
   }
 }
 
-# NAT Gateway
-# Sits in the first public subnet
-# Allows ECS tasks in private subnets to make outbound internet requests
-# (S3 uploads, Pusher connections) without being reachable inbound
+resource "aws_nat_gateway" "cursus_nat_gw" {
+  for_each = var.cursus_public_subnets
 
-resource "aws_nat_gateway" "main" {
-  allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public[0].id   # Always in a public subnet
+  allocation_id = aws_eip.cursus_nat_eip[each.key].id
+  subnet_id     = aws_subnet.cursus_public[each.key].id
 
   tags = {
-    Name = "${var.app_name}-nat"
+    Name = "${var.app_name}_nat_gw_${each.key}"
   }
 
-  # IGW must exist before NAT gateway can be created
-  depends_on = [aws_internet_gateway.main]
-}
-
-# Public Route Table
-# Routes all internet-bound traffic (0.0.0.0/0) through the IGW
-
-resource "aws_route_table" "public" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main.id
-  }
-
-  tags = {
-    Name = "${var.app_name}-public-rt"
-  }
-}
-
-# Associate public route table with each public subnet
-resource "aws_route_table_association" "public" {
-  count          = length(aws_subnet.public)
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public.id
-}
-
-# Private Route Table
-# Routes outbound internet traffic through the NAT Gateway
-# Inbound traffic from the internet cannot reach private subnets
-
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.main.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.main.id
-  }
-
-  tags = {
-    Name = "${var.app_name}-private-rt"
-  }
-}
-
-# Associate private route table with each private subnet
-resource "aws_route_table_association" "private" {
-  count          = length(aws_subnet.private)
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private.id
+  depends_on = [aws_internet_gateway.igw]
 }

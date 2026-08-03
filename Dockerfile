@@ -49,7 +49,7 @@ USER node
 
 # Add healthcheck for container monitoring
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider https://cursus.didheemose.dev/api/health || exit 1
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1

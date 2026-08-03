@@ -12,9 +12,9 @@ services:
     # Environment variables required to initialize the Postgres database
     # Note: Fill these in or map them to variables for security
     environment:
-      - POSTGRES_USER=
-      - POSTGRES_PASSWORD=
-      - POSTGRES_DB=
+      - POSTGRES_USER=didheemose
+      - POSTGRES_PASSWORD=didheenotout
+      - POSTGRES_DB=lms-mvp
     # Persists database data by linking a named volume to the container's internal storage
     volumes:
       - db-data:/var/lib/postgresql
@@ -35,9 +35,14 @@ services:
       - "3000:3000"
     # Loads runtime environment variables from a local '.env' file into the container
     env_file:
-      - .env.example
+      - .env
 
-# Definition of named volumes to persist data independently of container lifecycles
+# # Definition of named volumes to persist data independently of container lifecycles
+# volumes:
+#   db-data:
+#     driver: local # Uses the standard local storage driver on the host system
+
 volumes:
   db-data:
-    driver: local # Uses the standard local storage driver on the host system
+    external: true
+    name: aeaf02a43b7abc6ebdb470294562e5008281d1d6308f09d81d4a46e3ca468326
