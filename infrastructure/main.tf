@@ -6,4 +6,11 @@ terraform {
     }
   }
   required_version = ">= 1.2"
+
+  backend "s3" {
+    bucket       = "cursus-lms-terraform-state"
+    region       = "eu-west-1"
+    encrypt      = true
+    use_lockfile = true
+  }
 }

@@ -1,0 +1,41 @@
+name: "Pipeline 3: Run Database Migration"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "prisma/**"
+      - ".github/workflows/deploy-migration.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: eu-west-1
+      ECS_CLUSTER: cursus-lms-cluster
+      ECS_TASK_DEFINITION_FAMILY: cursus-lms-task-definition
+      CONTAINER_NAME: cursus-lms-app
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Run database migration via ECS run-task
+        run: |
+          aws ecs run-task \
+            --cluster "${{ env.ECS_CLUSTER }}" \
+            --task-definition "${{ env.ECS_TASK_DEFINITION_FAMILY }}" \
+            --launch-type FARGATE \
+            --network-configuration "awsvpcConfiguration={subnets=${{ vars.ECS_SUBNET_IDS }},securityGroups=[\"${{ vars.ECS_SECURITY_GROUP_ID }}\"],assignPublicIp=DISABLED}" \
+            --overrides "{\"containerOverrides\":[{\"name\":\"${{ env.CONTAINER_NAME }}\",\"command\":[\"npx\",\"prisma\",\"migrate\",\"deploy\"]}]}"

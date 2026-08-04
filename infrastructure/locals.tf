@@ -1,7 +1,9 @@
 locals {
-  is_production = var.environment == "production"
+  is_prod = var.environment == "prod"
 
-  bucket_force_destroy = local.is_production ? false : true
+  bucket_force_destroy = local.is_prod ? false : true
 
-  enable_deletion_protection = local.is_production ? true : false
+  enable_deletion_protection = local.is_prod ? true : false
+
+  ecr_repo_force_delete = local.is_prod ? false : true
 }

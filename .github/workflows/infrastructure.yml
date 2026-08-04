@@ -1,0 +1,39 @@
+name: "Pipeline 1: Infrastructure Deployment"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "terraform/**" # Only trigger this action on changes infrastructure code and push to main branch
+      - ".github/workflows/infrastructure.yml"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      AWS_REGION: eu-west-1
+      AWS_CSM_ENABLED: true
+
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v7.0.1
+
+      - name: Sets up Terraform CLI in your GitHub Actions
+        uses: hashicorp/setup-terraform@v4.0.1
+
+      - name: Configure AWS credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v6.2.3
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+          
+      - name: Terraform Init
+        run: terraform -chdir=infrastructure init -backend-config="key=dev/terraform.tfstate" -reconfigure
+
+      - name: Terraform Apply
+        run: terraform -chdir=infrastructure apply -var="environment=dev" -auto-approve

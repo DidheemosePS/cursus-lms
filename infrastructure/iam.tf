@@ -1,5 +1,5 @@
 resource "aws_iam_role" "ecs_app_task_role" {
-  name = "${var.app_name}-ecs-task-role"
+  name = "${var.project_name}-ecs-task-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -12,7 +12,7 @@ resource "aws_iam_role" "ecs_app_task_role" {
 }
 
 resource "aws_iam_role_policy" "s3_app_access" {
-  name = "${var.app_name}-app-s3-policy"
+  name = "${var.project_name}-app-s3-policy"
   role = aws_iam_role.ecs_app_task_role.id
 
   policy = jsonencode({
@@ -56,7 +56,7 @@ resource "aws_s3_bucket_policy" "alb_access_logs" {
 }
 
 resource "aws_iam_role" "cursus_ecs_service_iam_role" {
-  name = "${var.app_name}-ecs-service-iam-role"
+  name = "${var.project_name}-ecs-service-iam-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -70,7 +70,7 @@ resource "aws_iam_role" "cursus_ecs_service_iam_role" {
   })
 
   tags = {
-    Name = "${var.app_name}-ecs-execution-role"
+    Name = "${var.project_name}-ecs-execution-role"
   }
 }
 
@@ -80,7 +80,7 @@ resource "aws_iam_role_policy_attachment" "cursus_ecs_service_iam_role" {
 }
 
 resource "aws_iam_role_policy" "cursus_ecs_secrets_policy" {
-  name = "${var.app_name}-ecs-secrets-policy"
+  name = "${var.project_name}-ecs-secrets-policy"
   role = aws_iam_role.cursus_ecs_service_iam_role.id
 
   policy = jsonencode({
@@ -88,11 +88,16 @@ resource "aws_iam_role_policy" "cursus_ecs_secrets_policy" {
     Statement = [
       {
         Effect = "Allow"
-        Action = ["secretsmanager:GetSecretValue"]
+        Action = [
+          "secretsmanager:GetSecretValue",
+          "ssm:GetParameters"
+        ]
         Resource = [
           aws_secretsmanager_secret.database_url.arn,
-          aws_secretsmanager_secret.session_password.arn,
-          aws_secretsmanager_secret.pusher_secret.arn
+          aws_ssm_parameter.session_password.arn,
+          aws_ssm_parameter.pusher_app_id.arn,
+          aws_ssm_parameter.pusher_key.arn,
+          aws_ssm_parameter.pusher_secret.arn
         ]
       }
     ]
@@ -100,7 +105,7 @@ resource "aws_iam_role_policy" "cursus_ecs_secrets_policy" {
 }
 
 resource "aws_iam_role" "rds_proxy_role" {
-  name = "${var.app_name}-rds-proxy-role"
+  name = "${var.project_name}-rds-proxy-role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -117,7 +122,7 @@ resource "aws_iam_role" "rds_proxy_role" {
 }
 
 resource "aws_iam_role_policy" "rds_proxy_policy" {
-  name = "${var.app_name}-rds-proxy-policy"
+  name = "${var.project_name}-rds-proxy-policy"
   role = aws_iam_role.rds_proxy_role.id
 
   policy = jsonencode({

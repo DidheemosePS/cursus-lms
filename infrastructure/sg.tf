@@ -1,7 +1,7 @@
 resource "aws_security_group" "cursus_vpce_sg" {
-  name   = "${var.app_name}_vpce_sg"
+  name   = "${var.project_name}_vpce_sg"
   vpc_id = aws_vpc.cursus_vpc.id
-  tags   = { Name = "${var.app_name}_vpce_sg" }
+  tags   = { Name = "${var.project_name}_vpce_sg" }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "cursus_vpce_in" {
@@ -14,12 +14,12 @@ resource "aws_vpc_security_group_ingress_rule" "cursus_vpce_in" {
 }
 
 resource "aws_security_group" "cursus_alb_sg" {
-  name        = "${var.app_name}_alb_sg"
+  name        = "${var.project_name}_alb_sg"
   description = "Allow web requests from anyone on the global internet"
   vpc_id      = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}_alb_sg"
+    Name = "${var.project_name}_alb_sg"
   }
 }
 
@@ -51,12 +51,12 @@ resource "aws_vpc_security_group_egress_rule" "cursus_alb_sg_out" {
 }
 
 resource "aws_security_group" "cursus_web_sg" {
-  name        = "${var.app_name}_web_sg"
+  name        = "${var.project_name}_web_sg"
   description = "Allow only the trusted traffic that comes directly from ALBs security group"
   vpc_id      = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}_web_sg"
+    Name = "${var.project_name}_web_sg"
   }
 }
 
@@ -92,11 +92,11 @@ resource "aws_vpc_security_group_egress_rule" "cursus_web_sg_out_https" {
 # RDS Proxy
 
 resource "aws_security_group" "cursus_proxy_sg" {
-  name        = "${var.app_name}-proxy-sg"
+  name        = "${var.project_name}-proxy-sg"
   description = "Security group for RDS Proxy"
   vpc_id      = aws_vpc.cursus_vpc.id
   tags = {
-    Name = "${var.app_name}_proxy_sg"
+    Name = "${var.project_name}_proxy_sg"
   }
 }
 
@@ -121,12 +121,12 @@ resource "aws_vpc_security_group_ingress_rule" "cursus_proxy_sg_out" {
 # DB
 
 resource "aws_security_group" "cursus_db_sg" {
-  name        = "${var.app_name}_db_sg"
+  name        = "${var.project_name}_db_sg"
   description = "Allow only the trusted traffic that comes directly from Webs security group"
   vpc_id      = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}_db_sg"
+    Name = "${var.project_name}_db_sg"
   }
 }
 

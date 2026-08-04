@@ -1,17 +1,20 @@
-name: Deploy to Amazon ECS
+name: "Pipeline 2: Deploy Application"
 
 on:
   push:
-    branches:
-      - main
+    branches: ["main"]
+    paths-ignore:
+      - "terraform/**"
+      - "prisma/**"
+      - "**.md"
+      - ".gitignore"
 
 permissions:
   id-token: write
   contents: read
 
 jobs:
-  deploy:
-    name: Build & Deploy application
+  build-and-push:
     runs-on: ubuntu-latest
 
     env:
@@ -26,7 +29,7 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v7.0.1
 
-      - name: Configure AWS credentials
+      - name: Configure AWS credentials (OIDC)
         uses: aws-actions/configure-aws-credentials@v6.2.3
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
@@ -49,7 +52,7 @@ jobs:
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition ${{ env.ECS_TASK_DEFINITION_FAMILY }} --query taskDefinition > task-definition.json
-              
+
       - name: Render Amazon ECS task definition
         id: render-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1

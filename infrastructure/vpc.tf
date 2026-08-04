@@ -1,5 +1,13 @@
 provider "aws" {
   region = var.aws_region
+
+  default_tags {
+    tags = {
+      Environment = var.environment
+      Project     = var.project_name
+      ManagedBy   = "Terraform"
+    }
+  }
 }
 
 resource "aws_vpc" "cursus_vpc" {
@@ -8,7 +16,7 @@ resource "aws_vpc" "cursus_vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "${var.app_name}_vpc"
+    Name = "${var.project_name}-${var.environment}-vpc"
   }
 }
 
@@ -19,7 +27,7 @@ resource "aws_vpc_endpoint" "s3" {
   route_table_ids   = [for rt in aws_route_table.cursus_private_rt : rt.id]
 
   tags = {
-    Name = "${var.app_name}-s3-endpoint"
+    Name = "${var.project_name}-${var.environment}-s3-endpoint"
   }
 }
 
@@ -32,7 +40,7 @@ resource "aws_vpc_endpoint" "secretsmanager" {
   private_dns_enabled = true
 
   tags = {
-    Name = "${var.app_name}-secretsmanager-endpoint"
+    Name = "${var.project_name}-${var.environment}-secretsmanager-endpoint"
   }
 }
 
@@ -40,7 +48,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}_igw"
+    Name = "${var.project_name}-${var.environment}-igw"
   }
 }
 
@@ -52,7 +60,7 @@ resource "aws_subnet" "cursus_public" {
   availability_zone = each.value.availability_zone
 
   tags = {
-    Name = "${var.app_name}_public_${each.key}"
+    Name = "${var.project_name}-${var.environment}-public-${each.key}"
   }
 }
 
@@ -64,7 +72,7 @@ resource "aws_subnet" "cursus_private" {
   availability_zone = each.value.availability_zone
 
   tags = {
-    Name = "${var.app_name}_private_${each.key}"
+    Name = "${var.project_name}-${var.environment}private-${each.key}"
   }
 }
 
@@ -72,7 +80,7 @@ resource "aws_route_table" "cursus_public_rt" {
   vpc_id = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}_public_rt"
+    Name = "${var.project_name}-${var.environment}-public_rt"
   }
 }
 
@@ -95,7 +103,7 @@ resource "aws_route_table" "cursus_private_rt" {
   vpc_id = aws_vpc.cursus_vpc.id
 
   tags = {
-    Name = "${var.app_name}_private_rt"
+    Name = "${var.project_name}-${var.environment}-private_rt"
   }
 }
 
@@ -120,7 +128,7 @@ resource "aws_eip" "cursus_nat_eip" {
   domain = "vpc"
 
   tags = {
-    Name = "${var.app_name}_nat_eip_${each.key}"
+    Name = "${var.project_name}-${var.environment}-nat-eip-${each.key}"
   }
 }
 
@@ -131,7 +139,7 @@ resource "aws_nat_gateway" "cursus_nat_gw" {
   subnet_id     = aws_subnet.cursus_public[each.key].id
 
   tags = {
-    Name = "${var.app_name}_nat_gw_${each.key}"
+    Name = "${var.project_name}-${var.environment}-nat-gw-${each.key}"
   }
 
   depends_on = [aws_internet_gateway.igw]

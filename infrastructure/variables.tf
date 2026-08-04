@@ -4,15 +4,32 @@ variable "aws_region" {
   default     = "eu-west-1"
 }
 
-variable "app_name" {
+variable "environment" {
+  description = "The deployment environment (dev or prod)"
+  type        = string
+  default     = "prod"
+}
+
+variable "project_name" {
   type    = string
   default = "cursus-lms"
 }
 
-variable "APP_URL" {
+variable "domain_name" {
+  type    = string
+  default = "cursus-aws.didheemose.dev"
+}
+
+variable "container_port" {
+  type    = number
+  default = 3000
+}
+
+variable "app_url" {
   type    = string
   default = "https://cursus-aws.didheemose.dev"
 }
+
 
 variable "AWS_S3_REGION" {
   type    = string
@@ -34,16 +51,7 @@ variable "db_username" {
   default = "cursuslmsadmin"
 }
 
-variable "domain_name" {
-  type    = string
-  default = "cursus-aws.didheemose.dev"
-}
 
-variable "environment" {
-  description = "The deployment environment (development or production)"
-  type        = string
-  default     = "production"
-}
 
 variable "cursus_public_subnets" {
   type = map(object({

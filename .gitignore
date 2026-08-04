@@ -51,8 +51,8 @@ next-env.d.ts
 prisma/seed.ts
 
 # Terraform
-.terraform/
 *.tfstate
 *.tfstate.*
-.terraform.tfstate.lock.info
+*.tfstate.backup
 .terraform.lock.hcl
+.terraform/
