@@ -91,7 +91,8 @@
         "ecs:UpdateService",
         "ecs:RegisterTaskDefinition",
         "ecs:DeregisterTaskDefinition",
-        "ecs:RunTask"
+        "ecs:RunTask",
+        "ecs:TagResource"
       ],
       "Resource": "*"
     },
@@ -170,6 +171,19 @@
         "route53:GetHostedZone",
         "route53:ListTagsForResource",
         "route53:ListResourceRecordSets"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ECSLogs",
+      "Effect": "Allow",
+      "Action": [
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:TagResource",
+        "logs:PutRetentionPolicy",
+        "logs:DeleteLogGroup"
       ],
       "Resource": "*"
     }

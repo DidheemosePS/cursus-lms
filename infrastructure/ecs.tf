@@ -1,5 +1,10 @@
 resource "aws_ecs_cluster" "cursus_cluster" {
   name = "${var.project_name}-cluster"
+
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 resource "aws_cloudwatch_log_group" "ecs" {
