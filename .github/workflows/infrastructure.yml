@@ -4,7 +4,7 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "terraform/**" # Only trigger this action on changes infrastructure code and push to main branch
+      - "infrastructure/**" # Only trigger this action on changes infrastructure code and push to main branch
       - ".github/workflows/infrastructure.yml"
 
 permissions:

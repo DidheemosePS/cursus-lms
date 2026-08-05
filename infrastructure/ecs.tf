@@ -68,9 +68,9 @@ resource "aws_ecs_task_definition" "cursus_task_definition" {
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = aws_cloudwatch_log_group.ecs.name
+          "awslogs-group"         = aws_cloudwatch_log_group.ecs_logs.name
           "awslogs-region"        = var.aws_region
-          "awslogs-stream-prefix" = "nextjs"
+          "awslogs-stream-prefix" = "ecs"
         }
       }
     }
