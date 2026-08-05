@@ -51,7 +51,10 @@ variable "db_username" {
   default = "cursuslmsadmin"
 }
 
-
+variable "email" {
+  type    = string
+  default = "sebastiandidheemose2002@gmail.com"
+}
 
 variable "cursus_public_subnets" {
   type = map(object({

@@ -92,7 +92,8 @@
         "ecs:RegisterTaskDefinition",
         "ecs:DeregisterTaskDefinition",
         "ecs:RunTask",
-        "ecs:TagResource"
+        "ecs:TagResource",
+        "ecs:UpdateCluster"
       ],
       "Resource": "*"
     },
@@ -184,6 +185,43 @@
         "logs:TagResource",
         "logs:PutRetentionPolicy",
         "logs:DeleteLogGroup"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "SNS",
+      "Effect": "Allow",
+      "Action": [
+        "sns:AddPermission",
+        "sns:DeleteTopic",
+        "sns:CreateTopic",
+        "sns:TagResource",
+        "sns:ListTagsForResource",
+        "sns:SetTopicAttributes",
+        "sns:GetTopicAttributes",
+        "sns:ListSubscriptionsByTopic",
+        "sns:Publish",
+        "sns:Subscribe",
+        "sns:GetSubscriptionAttributes",
+        "sns:Unsubscribe"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CloudWatchAlert",
+      "Effect": "Allow",
+      "Action": [
+        "cloudwatch:PutMetricAlarm",
+        "cloudwatch:DescribeAlarms",
+        "cloudwatch:ListTagsForResource",
+        "cloudwatch:DeleteAlarms",
+        "cloudwatch:DeleteMetricStream",
+        "cloudwatch:DescribeAlarmHistory",
+        "cloudwatch:DescribeAlarmsForMetric",
+        "cloudwatch:DisableAlarmActions",
+        "cloudwatch:EnableAlarmActions",
+        "cloudwatch:TagResource",
+        "cloudwatch:UntagResource"
       ],
       "Resource": "*"
     }
